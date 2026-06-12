@@ -10,3 +10,7 @@ cache/
 # Зависимости
 node_modules/
 vendor/
+
+# Плагины распространяются со своим vendor/ — он нужен им в runtime
+!plugins/*/vendor/
+!plugins/*/vendor/**
