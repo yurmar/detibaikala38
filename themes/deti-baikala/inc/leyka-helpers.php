@@ -38,16 +38,12 @@ function db_campaign_progress( $post_id ) {
 
 	if ( class_exists( 'Leyka_Campaign' ) ) {
 		try {
-			$campaign = Leyka_Campaign::get_by_id( $post_id );
-			if ( $campaign ) {
-				if ( method_exists( $campaign, 'collected_amount' ) ) {
-					$collected = (float) $campaign->collected_amount;
-				}
-				if ( method_exists( $campaign, 'target_amount' ) ) {
-					$target = (float) $campaign->target_amount;
-				}
+			$campaign = new Leyka_Campaign( $post_id );
+			if ( $campaign && $campaign->id ) {
+				$collected = (float) $campaign->total_funded;
+				$target    = (float) $campaign->target;
 			}
-		} catch ( Exception $e ) {
+		} catch ( Throwable $e ) {
 			$collected = 0;
 			$target    = 0;
 		}
