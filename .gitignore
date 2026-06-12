@@ -1,0 +1,11 @@
+.DS_Store
+*.log
+
+# Пользовательские медиа и кэш — на проде свои, не деплоятся через git
+uploads/
+upgrade/
+cache/
+
+# Зависимости
+node_modules/
+vendor/
