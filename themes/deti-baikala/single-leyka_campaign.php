@@ -39,11 +39,6 @@ while ( have_posts() ) :
       <?php the_content(); ?>
     </div>
 
-    <div class="donate-form" id="donate-form">
-      <h3><?php esc_html_e( 'Поддержать сбор', 'deti-baikala' ); ?></h3>
-      <?php echo do_shortcode( '[leyka_donation_form campaign_id="' . get_the_ID() . '"]' ); ?>
-    </div>
-
     <div class="article-share">
       <span class="article-share__label"><?php esc_html_e( 'Поделиться:', 'deti-baikala' ); ?></span>
       <?php db_render_social_icons(); ?>
