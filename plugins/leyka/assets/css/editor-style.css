@@ -1,0 +1,28 @@
+/**
+ * Editor Style
+ */
+.editor-styles-wrapper .wp-block.is-template-star {
+  max-width: 600px;
+  width: auto;
+}
+
+.editor-styles-wrapper .wp-block.is-template-need-help {
+  max-width: 1200px !important;
+}
+
+/* Controls */
+.leyka-components-base-control__label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.leyka-components-base-control .components-font-size-picker__controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.leyka-components-base-control .components-font-size-picker__controls .components-color-palette__clear {
+  margin-top: 0;
+  margin-left: 10px;
+}

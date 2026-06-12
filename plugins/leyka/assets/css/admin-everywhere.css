@@ -1,0 +1,25 @@
+/** Main plugin admin menu tweaks: */
+#adminmenu #toplevel_page_leyka .wp-submenu li:not(.wp-submenu-head) {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+#adminmenu #toplevel_page_leyka .wp-submenu li:not(.wp-submenu-head) .leyka-add-new {
+  padding-left: 6px;
+}
+
+#adminmenu #toplevel_page_leyka .wp-submenu li:not(.wp-submenu-head) .leyka-add-new:before {
+  content: '\f502';
+  display: inline-block;
+  cursor: pointer;
+  pointer-events: all;
+  font-size: 16px;
+}
+
+/** Main plugin admin menu tweaks - END */
+
+/*# sourceMappingURL=admin-everywhere.css.map */

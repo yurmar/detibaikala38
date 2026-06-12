@@ -1,0 +1,81 @@
+/**
+ * Leyka Menu Icon 
+ **/
+
+#adminmenu #toplevel_page_leyka .wp-menu-image {
+	position: relative;
+	background: transparent; }
+
+#adminmenu #toplevel_page_leyka div.wp-menu-image:before {
+	display: none; }
+	
+#adminmenu #toplevel_page_leyka div.wp-menu-image:after {
+	content: '';
+	display: block;
+	width: 18px;
+	height: 18px;
+	background: transparent url(../img/menu-icon.png) no-repeat 0 -20px;
+	background-image: url(../img/menu-icon.svg);
+	position: absolute;
+	top: 8px;
+	left: 8px;
+}
+
+#adminmenu #toplevel_page_leyka:hover .wp-menu-image:after,
+#adminmenu #toplevel_page_leyka .wp-has-current-submenu .wp-menu-image:after {
+	background-position: 0 0;
+}
+
+#tech-export-wrapper {
+    display:inline;
+    font-size:13px;
+}
+
+#tech-export-wrapper input {
+    margin-left:5px;
+}
+
+span.dashicons-editor-help.has-tooltip {
+    cursor: pointer;
+    display: inline;
+}
+
+/** jQuery UI tooltips */
+.ui-tooltip {
+    border-width: 2px;
+    padding: 8px;
+    position: absolute;
+    z-index: 9999;
+    max-width: 300px;
+    -webkit-box-shadow: 0 0 5px #aaa;
+    box-shadow: 0 0 5px #aaa;
+    background: #fff;
+}
+
+/** Admin notices */
+.leyka-message {
+    overflow: hidden;
+    position: relative;
+    border-left-color: #1db318 !important;
+}
+.leyka-message a.button-primary,
+.leyka-message a.button-secondary {
+    text-decoration: none !important;
+}
+.leyka-message a.leyka-message-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px 15px 10px 21px;
+    font-size: 13px;
+    line-height: 1.23076923;
+    text-decoration: none;
+}
+.leyka-message a.leyka-message-close:before {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    -webkit-transition: all .1s ease-in-out;
+    transition: all .1s ease-in-out;
+}
+/** Admin notices - END */
