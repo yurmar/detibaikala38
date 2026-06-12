@@ -65,6 +65,7 @@ h3{font-size:clamp(1.1rem,2vw,1.4rem)}
 .container{max-width:1200px;margin:0 auto;padding:0 1.5rem}
 .section{padding:5rem 0}
 .section--alt{background:var(--bg-secondary)}
+.leyka-pf .section{padding:0}
 
 /* ===== BUTTONS ===== */
 .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.6rem;border-radius:50px;font-family:'Montserrat',sans-serif;font-weight:600;font-size:0.85rem;letter-spacing:0.04em;cursor:pointer;border:none;transition:all var(--transition);white-space:nowrap}
