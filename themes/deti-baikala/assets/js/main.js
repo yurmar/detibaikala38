@@ -5,14 +5,12 @@
 	var html = document.documentElement;
 	var themeBtn = document.getElementById( 'themeToggle' );
 	if ( themeBtn ) {
-		themeBtn.textContent = html.dataset.theme === 'dark' ? '☀️' : '🌙';
 		themeBtn.addEventListener( 'click', function () {
 			var next = html.dataset.theme === 'dark' ? 'light' : 'dark';
 			html.dataset.theme = next;
 			try {
 				localStorage.setItem( 'theme', next );
 			} catch ( e ) {}
-			themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
 		} );
 	}
 
