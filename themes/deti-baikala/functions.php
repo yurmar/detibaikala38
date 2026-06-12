@@ -5,7 +5,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'DB_THEME_VERSION', '1.0.1' );
+define( 'DB_THEME_VERSION', '1.0.2' );
 define( 'DB_THEME_DIR', get_template_directory() );
 define( 'DB_THEME_URI', get_template_directory_uri() );
 
@@ -188,3 +188,16 @@ function db_home_query( $query ) {
 	}
 }
 add_action( 'pre_get_posts', 'db_home_query' );
+
+/**
+ * Уменьшаем логотип на странице "Технические работы" (плагин Maintenance) —
+ * загруженная картинка слишком крупная.
+ */
+function db_maintenance_logo_style() {
+	?>
+	<style>
+		.logo-box img{width:120px;height:auto;max-width:120px}
+	</style>
+	<?php
+}
+add_action( 'load_custom_style', 'db_maintenance_logo_style', 30 );

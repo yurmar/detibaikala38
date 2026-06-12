@@ -12,9 +12,9 @@
 <header class="header" id="header">
   <div class="container">
     <div class="header__inner">
-      <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="logo">
+      <div class="logo">
         <?php db_render_logo(); ?>
-      </a>
+      </div>
       <nav class="nav">
         <?php db_render_primary_nav(); ?>
       </nav>

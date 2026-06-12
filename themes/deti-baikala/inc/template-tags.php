@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function db_render_logo( $with_text = false ) {
 	if ( has_custom_logo() ) {
-		echo '<span class="logo__icon">';
+		echo '<span class="logo__icon logo__icon--image">';
 		the_custom_logo();
 		echo '</span>';
 	} else {
-		echo '<div class="logo__icon">' . esc_html( get_theme_mod( 'db_logo_initials', 'ДБ' ) ) . '</div>';
+		echo '<a href="' . esc_url( home_url( '/' ) ) . '" class="logo__icon">' . esc_html( get_theme_mod( 'db_logo_initials', 'ДБ' ) ) . '</a>';
 	}
 
 	if ( $with_text ) {
