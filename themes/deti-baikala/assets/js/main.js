@@ -50,7 +50,7 @@
 					}
 				} );
 			},
-			{ threshold: 0.12, rootMargin: '-35% 0px -35% 0px' }
+			{ threshold: 0.12, rootMargin: '-15% 0px -15% 0px' }
 		);
 		document.querySelectorAll( '.reveal' ).forEach( function ( el ) {
 			observer.observe( el );
