@@ -85,7 +85,10 @@
 
     <div class="footer__bottom">
       <div class="footer__copy"><?php db_render_copyright(); ?></div>
-      <?php db_render_payment_badge(); ?>
+      <div class="footer__right">
+        <?php db_render_payment_badge(); ?>
+        <a href="https://yurmar.ru" class="footer__credit" target="_blank" rel="noopener"><?php esc_html_e( 'Разработано YurMar', 'deti-baikala' ); ?></a>
+      </div>
     </div>
   </div>
 </footer>
