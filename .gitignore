@@ -4,6 +4,7 @@
 # Пользовательские медиа и кэш — на проде свои, не деплоятся через git
 uploads/
 upgrade/
+upgrade-temp-backup/
 cache/
 
 # Зависимости
