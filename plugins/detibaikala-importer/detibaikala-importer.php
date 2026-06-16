@@ -644,8 +644,17 @@ function dbi_parse_article( string $html, string $source_url ): ?array {
     @$dom->loadHTML( mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) );
     $xpath = new DOMXPath( $dom );
 
-    $container = $xpath->query( '//*[contains(@class,"col-md-9")]' )->item( 0 )
-              ?? $xpath->query( '//body' )->item( 0 );
+    // Ищем col-md-9, в котором есть h2 (первый col-md-9 может принадлежать Wayback Machine UI)
+    $container = null;
+    foreach ( $xpath->query( '//*[contains(@class,"col-md-9")]' ) as $node ) {
+        if ( $xpath->query( './/h2', $node )->length > 0 ) {
+            $container = $node;
+            break;
+        }
+    }
+    if ( ! $container ) {
+        $container = $xpath->query( '//body' )->item( 0 );
+    }
 
     // Заголовок
     $title = '';
@@ -718,7 +727,7 @@ function dbi_parse_date( string $raw ): string {
     if ( ! $raw ) return current_time( 'mysql' );
 
     if ( preg_match( '/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $raw, $m ) ) {
-        return sprintf( '%04d-%02d-%02d 00:00:00', $m[3], $m[2], $m[1] );
+        return sprintf( '%04d-%02d-%02d 00:00:00', $m[3], $m[1], $m[2] );
     }
     if ( preg_match( '/(\d{4}-\d{2}-\d{2})/', $raw, $m ) ) {
         return $m[1] . ' 00:00:00';
