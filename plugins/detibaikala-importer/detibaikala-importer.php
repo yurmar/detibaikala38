@@ -301,7 +301,11 @@ add_action( 'wp_ajax_dbi_import_post', function () {
 
     $data = dbi_parse_article( $html, $url );
     if ( ! $data ) {
-        dbi_log( 'ОШИБКА ПАРСИНГА: ' . $url );
+        // Log a snippet to help diagnose the structure
+        $snippet = substr( strip_tags( $html ), 0, 300 );
+        $h2_pos  = strpos( $html, '<h2' );
+        $h1_pos  = strpos( $html, '<h1' );
+        dbi_log( 'ОШИБКА ПАРСИНГА: ' . $url . ' | h2=' . ( $h2_pos !== false ? $h2_pos : 'нет' ) . ' h1=' . ( $h1_pos !== false ? $h1_pos : 'нет' ) . ' | ' . mb_substr( $snippet, 0, 200 ) );
         wp_send_json_error( 'Не удалось распарсить статью' );
     }
 
