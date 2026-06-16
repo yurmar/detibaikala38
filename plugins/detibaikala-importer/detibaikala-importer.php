@@ -60,21 +60,17 @@ function dbi_admin_page() {
         <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
             <h3 style="margin-top:0">Шаг 2 — Импортировать собранные статьи</h3>
             <p>
-                Собрано ссылок: <strong><?= $total ?></strong><br>
-                Импортировано: <strong><?= $done_cnt ?></strong> / <?= $total ?><br>
-                Осталось: <strong><?= count( $remaining ) ?></strong>
+                Собрано ссылок: <strong id="dbi-step2-total"><?= $total ?></strong><br>
+                Импортировано: <strong id="dbi-step2-done"><?= $done_cnt ?></strong> / <span id="dbi-step2-total2"><?= $total ?></span><br>
+                Осталось: <strong id="dbi-step2-remaining"><?= count( $remaining ) ?></strong>
             </p>
 
-            <?php if ( count( $remaining ) > 0 ): ?>
-                <button id="btn-import" class="button button-primary">Импортировать</button>
-                <button id="btn-stop" class="button" style="display:none;margin-left:8px">Остановить</button>
-            <?php elseif ( $total > 0 ): ?>
-                <p style="color:green;margin:0"><strong>Все собранные статьи импортированы!</strong></p>
-            <?php else: ?>
-                <p style="color:#888;margin:0">Сначала соберите ссылки на шаге 1.</p>
-            <?php endif; ?>
+            <button id="btn-import" class="button button-primary"<?= count( $remaining ) === 0 ? ' style="display:none"' : '' ?>>Импортировать</button>
+            <button id="btn-stop" class="button" style="display:none;margin-left:8px">Остановить</button>
+            <p id="dbi-step2-done-msg" style="color:green;margin:0<?= ( $total > 0 && count( $remaining ) === 0 ) ? '' : ';display:none' ?>"><strong>Все собранные статьи импортированы!</strong></p>
+            <p id="dbi-step2-empty-msg" style="color:#888;margin:0<?= $total === 0 ? '' : ';display:none' ?>">Сначала соберите ссылки на шаге 1.</p>
 
-            <button id="btn-reset" class="button button-secondary" style="margin-left:<?= count($remaining) > 0 ? '20' : '0' ?>px">Сбросить всё</button>
+            <button id="btn-reset" class="button button-secondary" style="margin-top:12px">Сбросить всё</button>
 
             <div id="dbi-import-progress" style="margin-top:12px;display:none">
                 <div style="background:#e0e0e0;height:20px;border-radius:4px;width:500px">
@@ -122,6 +118,7 @@ function dbi_admin_page() {
                         '✓ Найдено новых ссылок на этой странице: ' + r.data.found +
                         '. Всего собрано: ' + r.data.total + '.'
                     );
+                    dbiRefreshStep2();
                 } else {
                     $('#dbi-collect-status').css('color','red').text('Ошибка: ' + r.data);
                 }
@@ -179,6 +176,34 @@ function dbi_admin_page() {
                 location.reload();
             });
         });
+
+        function dbiRefreshStep2() {
+            $.post(ajax, {action:'dbi_get_status', nonce}, function(r){
+                if (!r.success) return;
+                importQueue   = r.data.remaining;
+                importedCount = r.data.done;
+                grandTotal    = r.data.total;
+
+                $('#dbi-step2-total').text(grandTotal);
+                $('#dbi-step2-total2').text(grandTotal);
+                $('#dbi-step2-done').text(importedCount);
+                $('#dbi-step2-remaining').text(importQueue.length);
+
+                if (importQueue.length > 0) {
+                    if (!running) $('#btn-import').show();
+                    $('#dbi-step2-done-msg').hide();
+                    $('#dbi-step2-empty-msg').hide();
+                } else if (grandTotal > 0) {
+                    if (!running) $('#btn-import').hide();
+                    $('#dbi-step2-done-msg').show();
+                    $('#dbi-step2-empty-msg').hide();
+                } else {
+                    $('#btn-import').hide();
+                    $('#dbi-step2-done-msg').hide();
+                    $('#dbi-step2-empty-msg').show();
+                }
+            });
+        }
     })(jQuery);
     </script>
     <?php
@@ -230,6 +255,25 @@ add_action( 'wp_ajax_dbi_collect_page', function () {
     wp_send_json_success( [
         'found' => count( $links ),
         'total' => count( $merged ),
+    ] );
+} );
+
+// ──────────────────────────────────────────────
+// AJAX: Get current status (for Step 2 refresh)
+// ──────────────────────────────────────────────
+
+add_action( 'wp_ajax_dbi_get_status', function () {
+    check_ajax_referer( 'dbi_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_die();
+
+    $urls      = get_option( DBI_OPTION_URLS, [] );
+    $done      = get_option( DBI_OPTION_DONE, [] );
+    $remaining = array_values( array_diff( $urls, $done ) );
+
+    wp_send_json_success( [
+        'total'     => count( $urls ),
+        'done'      => count( $done ),
+        'remaining' => $remaining,
     ] );
 } );
 
