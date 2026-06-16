@@ -2,18 +2,16 @@
 /**
  * Plugin Name: Deti Baikala Importer
  * Description: Импорт новостей с archive.org в рубрику «Новости» (ID=1)
- * Version: 1.0
+ * Version: 1.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'DBI_CATEGORY_ID', 1 );
-define( 'DBI_BASE_ARCHIVE', 'https://web.archive.org/web/20241214102943' );
-define( 'DBI_BASE_URL', 'https://detibaikala.com' );
-define( 'DBI_TOTAL_PAGES', 59 );
-define( 'DBI_OPTION_URLS', 'dbi_collected_urls' );
-define( 'DBI_OPTION_DONE', 'dbi_imported_urls' );
-define( 'DBI_OPTION_LOG', 'dbi_import_log' );
+define( 'DBI_CATEGORY_ID',        1 );
+define( 'DBI_OPTION_ARCHIVE_URL', 'dbi_archive_url' );  // URL первой страницы категории
+define( 'DBI_OPTION_URLS',        'dbi_collected_urls' );
+define( 'DBI_OPTION_DONE',        'dbi_imported_urls' );
+define( 'DBI_OPTION_LOG',         'dbi_import_log' );
 
 // ──────────────────────────────────────────────
 // Admin menu
@@ -30,37 +28,66 @@ add_action( 'admin_menu', function () {
 } );
 
 function dbi_admin_page() {
-    $urls      = get_option( DBI_OPTION_URLS, [] );
-    $done      = get_option( DBI_OPTION_DONE, [] );
-    $log       = get_option( DBI_OPTION_LOG, [] );
-    $total     = count( $urls );
-    $done_cnt  = count( $done );
-    $remaining = array_values( array_diff( $urls, $done ) );
+    $archive_url = get_option( DBI_OPTION_ARCHIVE_URL, '' );
+    $urls        = get_option( DBI_OPTION_URLS, [] );
+    $done        = get_option( DBI_OPTION_DONE, [] );
+    $log         = get_option( DBI_OPTION_LOG, [] );
+    $total       = count( $urls );
+    $done_cnt    = count( $done );
+    $remaining   = array_values( array_diff( $urls, $done ) );
     ?>
     <div class="wrap">
         <h1>Импорт новостей с detibaikala.com</h1>
 
-        <p>
-            <strong>Шаг 1:</strong> Собрать все ссылки на статьи (59 страниц категории).<br>
-            <strong>Шаг 2:</strong> Импортировать статьи по одной.
-        </p>
-
-        <?php if ( $total === 0 ): ?>
-            <p>Ссылки ещё не собраны.</p>
-            <button id="btn-collect" class="button button-primary">Шаг 1: Собрать ссылки</button>
-        <?php else: ?>
-            <p>
-                Собрано ссылок: <strong><?= $total ?></strong><br>
-                Импортировано: <strong><?= $done_cnt ?></strong> / <?= $total ?><br>
-                Осталось: <strong><?= count( $remaining ) ?></strong>
+        <!-- ── Настройки URL ── -->
+        <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
+            <h3 style="margin-top:0">URL первой страницы категории (archive.org)</h3>
+            <p style="color:#666;margin-top:0;margin-bottom:8px">
+                Вставьте ссылку на <strong>первую страницу</strong> категории новостей из нужного снимка.<br>
+                Плагин сам перейдёт по ссылкам пагинации до последней страницы.<br>
+                Пример: <code>https://web.archive.org/web/20241214102943/https://detibaikala.com/category/news/</code>
             </p>
-            <?php if ( count( $remaining ) > 0 ): ?>
-                <button id="btn-import" class="button button-primary">Шаг 2: Импортировать</button>
-                <button id="btn-stop" class="button" style="display:none">Остановить</button>
-            <?php else: ?>
-                <p style="color:green"><strong>Импорт завершён!</strong></p>
+            <div style="display:flex;gap:8px;align-items:center">
+                <input id="dbi-archive-url" type="url" value="<?= esc_attr( $archive_url ) ?>"
+                       style="width:540px" class="regular-text"
+                       placeholder="https://web.archive.org/web/TIMESTAMP/https://detibaikala.com/category/news/">
+                <button id="btn-save-url" class="button button-primary">Сохранить</button>
+            </div>
+            <?php if ( $archive_url ): ?>
+                <p style="margin-bottom:0;color:#2a7a2a;margin-top:8px">
+                    ✓ Сохранено: <code><?= esc_html( $archive_url ) ?></code>
+                </p>
             <?php endif; ?>
-            <button id="btn-reset" class="button button-secondary" style="margin-left:20px">Сбросить всё</button>
+        </div>
+
+        <?php if ( ! $archive_url ): ?>
+            <p style="color:#c00"><strong>Укажите URL первой страницы категории выше, чтобы начать.</strong></p>
+        <?php else: ?>
+
+            <p>
+                <strong>Шаг 1:</strong> Собрать ссылки на статьи (плагин сам обходит все страницы пагинации).<br>
+                <strong>Шаг 2:</strong> Импортировать статьи по одной.
+            </p>
+
+            <?php if ( $total === 0 ): ?>
+                <p>Ссылки ещё не собраны.</p>
+                <button id="btn-collect" class="button button-primary">Шаг 1: Собрать ссылки</button>
+            <?php else: ?>
+                <p>
+                    Собрано ссылок: <strong><?= $total ?></strong><br>
+                    Импортировано: <strong><?= $done_cnt ?></strong> / <?= $total ?><br>
+                    Осталось: <strong><?= count( $remaining ) ?></strong>
+                </p>
+                <?php if ( count( $remaining ) > 0 ): ?>
+                    <button id="btn-import" class="button button-primary">Шаг 2: Импортировать</button>
+                    <button id="btn-stop" class="button" style="display:none">Остановить</button>
+                <?php else: ?>
+                    <p style="color:green"><strong>Импорт завершён!</strong></p>
+                <?php endif; ?>
+                <button id="btn-collect-more" class="button" style="margin-left:10px">Собрать ещё ссылки</button>
+                <button id="btn-reset" class="button button-secondary" style="margin-left:10px">Сбросить всё</button>
+            <?php endif; ?>
+
         <?php endif; ?>
 
         <div id="dbi-progress" style="margin-top:15px;display:none">
@@ -82,43 +109,70 @@ function dbi_admin_page() {
 
     <script>
     (function($){
-        const ajax = '<?= admin_url('admin-ajax.php') ?>';
-        const nonce = '<?= wp_create_nonce('dbi_nonce') ?>';
-        let running = false;
+        const ajax       = '<?= admin_url('admin-ajax.php') ?>';
+        const nonce      = '<?= wp_create_nonce('dbi_nonce') ?>';
+        const startUrl   = <?= json_encode( $archive_url ) ?>;
+        let running      = false;
 
-        $('#btn-collect').on('click', function(){
-            $(this).prop('disabled', true).text('Сбор...');
-            $('#dbi-progress').show();
-            collectPage(1, 0, []);
+        // ── Сохранить URL ──
+        $('#btn-save-url').on('click', function(){
+            const url = $('#dbi-archive-url').val().trim();
+            if (!url) { alert('Введите URL'); return; }
+            $(this).prop('disabled', true).text('Сохранение...');
+            $.post(ajax, {action:'dbi_save_settings', nonce, archive_url: url}, function(r){
+                if (r.success) {
+                    location.reload();
+                } else {
+                    alert('Ошибка: ' + r.data);
+                    $('#btn-save-url').prop('disabled', false).text('Сохранить');
+                }
+            });
         });
 
-        function collectPage(page, total, allUrls) {
-            $.post(ajax, {action:'dbi_collect_page', nonce, page}, function(r){
+        // ── Сбор ссылок: обход пагинации ──
+        function startCollect() {
+            $('#btn-collect, #btn-collect-more').prop('disabled', true).text('Сбор...');
+            $('#dbi-progress').show();
+            $('#dbi-bar').css('width', '0');
+            collectPage(startUrl, 1, 0);
+        }
+        $('#btn-collect').on('click', startCollect);
+        $('#btn-collect-more').on('click', startCollect);
+
+        // url  — полный archive.org URL текущей страницы пагинации
+        // pageNum — номер страницы для отображения
+        // totalFound — сколько ссылок нашли за все предыдущие страницы
+        function collectPage(url, pageNum, totalFound) {
+            $.post(ajax, {action:'dbi_collect_page', nonce, url}, function(r){
                 if (!r.success) {
-                    $('#dbi-status').text('Ошибка на стр. ' + page + ': ' + r.data);
+                    $('#dbi-status').html('<span style="color:red">Ошибка (стр.' + pageNum + '): ' + r.data + '</span>');
+                    setTimeout(function(){ collectPage(url, pageNum, totalFound); }, 5000);
                     return;
                 }
-                allUrls = allUrls.concat(r.data.urls);
-                total += r.data.urls.length;
-                $('#dbi-status').text('Страница ' + page + '/' + <?= DBI_TOTAL_PAGES ?> + ' — найдено ' + r.data.urls.length + ' ссылок');
-                updateBar(page, <?= DBI_TOTAL_PAGES ?>);
-                if (page < <?= DBI_TOTAL_PAGES ?>) {
-                    collectPage(page + 1, total, allUrls);
+                totalFound += r.data.found;
+                $('#dbi-status').text(
+                    'Страница ' + pageNum + ' — найдено ' + r.data.found + ' ссылок. Всего: ' + totalFound
+                );
+                // Анимация: пульсирующий прогресс без известного максимума
+                const w = Math.min(95, 10 + pageNum * 1.5);
+                $('#dbi-bar').css('width', w + '%');
+
+                if (r.data.next_url) {
+                    collectPage(r.data.next_url, pageNum + 1, totalFound);
                 } else {
-                    $('#dbi-status').text('Готово! Найдено ссылок: ' + allUrls.length + '. Перезагрузите страницу.');
-                    location.reload();
+                    $('#dbi-bar').css('width', '100%');
+                    $('#dbi-status').text('Готово! Всего ссылок найдено: ' + totalFound + '. Перезагружаю...');
+                    setTimeout(function(){ location.reload(); }, 1500);
                 }
             }).fail(function(){
-                // retry
-                setTimeout(function(){ collectPage(page, total, allUrls); }, 3000);
+                setTimeout(function(){ collectPage(url, pageNum, totalFound); }, 5000);
             });
         }
 
-        // ── Import ──
-        let importQueue = <?= json_encode( $remaining ) ?>;
-        let totalToImport = importQueue.length;
+        // ── Импорт ──
+        let importQueue   = <?= json_encode( $remaining ) ?>;
         let importedCount = <?= $done_cnt ?>;
-        let grandTotal = <?= $total ?>;
+        let grandTotal    = <?= $total ?>;
 
         $('#btn-import').on('click', function(){
             running = true;
@@ -139,18 +193,17 @@ function dbi_admin_page() {
             if (!running || importQueue.length === 0) {
                 if (importQueue.length === 0) {
                     $('#dbi-status').text('Импорт завершён!');
-                    location.reload();
+                    setTimeout(function(){ location.reload(); }, 1500);
                 }
                 return;
             }
             const url = importQueue.shift();
             $.post(ajax, {action:'dbi_import_post', nonce, url}, function(r){
                 importedCount++;
-                const msg = r.success
-                    ? '✓ ' + r.data.title
-                    : '✗ ' + url + ' → ' + r.data;
-                $('#dbi-status').text('[' + importedCount + '/' + grandTotal + '] ' + msg);
-                updateBar(importedCount, grandTotal);
+                const icon = r.success ? '✓' : '✗';
+                const msg  = r.success ? r.data.title : (url + ' → ' + r.data);
+                $('#dbi-status').text('[' + importedCount + '/' + grandTotal + '] ' + icon + ' ' + msg);
+                $('#dbi-bar').css('width', Math.round(importedCount / grandTotal * 100) + '%');
                 setTimeout(processNext, 800);
             }).fail(function(){
                 importQueue.unshift(url);
@@ -158,13 +211,8 @@ function dbi_admin_page() {
             });
         }
 
-        function updateBar(cur, max) {
-            const pct = Math.round(cur / max * 100);
-            $('#dbi-bar').css('width', pct + '%');
-        }
-
         $('#btn-reset').on('click', function(){
-            if (!confirm('Сбросить весь прогресс и собранные ссылки?')) return;
+            if (!confirm('Сбросить весь прогресс и собранные ссылки? URL архива останется.')) return;
             $.post(ajax, {action:'dbi_reset', nonce}, function(){
                 location.reload();
             });
@@ -175,19 +223,36 @@ function dbi_admin_page() {
 }
 
 // ──────────────────────────────────────────────
-// AJAX: Collect URLs from one category page
+// AJAX: Save settings
+// ──────────────────────────────────────────────
+
+add_action( 'wp_ajax_dbi_save_settings', function () {
+    check_ajax_referer( 'dbi_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_die();
+
+    $url = esc_url_raw( trim( $_POST['archive_url'] ?? '' ) );
+    if ( ! $url ) {
+        wp_send_json_error( 'Пустой URL' );
+    }
+    if ( ! preg_match( '~https://web\.archive\.org/web/\d{14}~', $url ) ) {
+        wp_send_json_error( 'Некорректный URL. Ожидается: https://web.archive.org/web/TIMESTAMP/...' );
+    }
+
+    update_option( DBI_OPTION_ARCHIVE_URL, $url, false );
+    wp_send_json_success();
+} );
+
+// ──────────────────────────────────────────────
+// AJAX: Collect URLs from one category page + find next page
 // ──────────────────────────────────────────────
 
 add_action( 'wp_ajax_dbi_collect_page', function () {
     check_ajax_referer( 'dbi_nonce', 'nonce' );
     if ( ! current_user_can( 'manage_options' ) ) wp_die();
 
-    $page = absint( $_POST['page'] ?? 1 );
-
-    if ( $page === 1 ) {
-        $url = DBI_BASE_ARCHIVE . '/https://detibaikala.com/category/news/';
-    } else {
-        $url = DBI_BASE_ARCHIVE . '/https://detibaikala.com/category/news/page/' . $page . '/';
+    $url = esc_url_raw( trim( $_POST['url'] ?? '' ) );
+    if ( ! $url ) {
+        wp_send_json_error( 'Пустой URL страницы' );
     }
 
     $html = dbi_fetch( $url );
@@ -195,14 +260,21 @@ add_action( 'wp_ajax_dbi_collect_page', function () {
         wp_send_json_error( $html->get_error_message() );
     }
 
+    // Статьи с текущей страницы
     $links = dbi_extract_article_links( $html );
 
-    // Merge with existing saved URLs (dedup)
+    // Сохраняем (дедупликация)
     $existing = get_option( DBI_OPTION_URLS, [] );
     $merged   = array_values( array_unique( array_merge( $existing, $links ) ) );
     update_option( DBI_OPTION_URLS, $merged, false );
 
-    wp_send_json_success( [ 'urls' => $links, 'page' => $page ] );
+    // Следующая страница пагинации (archive.org ссылка с её timestamp)
+    $next_url = dbi_find_next_page( $html, $url );
+
+    wp_send_json_success( [
+        'found'    => count( $links ),
+        'next_url' => $next_url,
+    ] );
 } );
 
 // ──────────────────────────────────────────────
@@ -216,7 +288,6 @@ add_action( 'wp_ajax_dbi_import_post', function () {
     $url = esc_url_raw( $_POST['url'] ?? '' );
     if ( ! $url ) wp_send_json_error( 'Пустой URL' );
 
-    // Check if already imported
     $done = get_option( DBI_OPTION_DONE, [] );
     if ( in_array( $url, $done, true ) ) {
         wp_send_json_success( [ 'title' => 'Уже импортирован', 'skipped' => true ] );
@@ -234,16 +305,14 @@ add_action( 'wp_ajax_dbi_import_post', function () {
         wp_send_json_error( 'Не удалось распарсить статью' );
     }
 
-    // Check for duplicate by title
-    $existing = get_page_by_title( $data['title'], OBJECT, 'post' );
-    if ( $existing ) {
+    // Проверка дубля: заголовок + дата + хеш текста
+    if ( dbi_is_duplicate( $data['title'], $data['date'], $data['content'] ) ) {
         dbi_log( 'ДУБЛЬ: ' . $data['title'] );
         $done[] = $url;
         update_option( DBI_OPTION_DONE, $done, false );
         wp_send_json_success( [ 'title' => $data['title'] . ' (дубль, пропущен)', 'skipped' => true ] );
     }
 
-    // Create post
     $post_id = wp_insert_post( [
         'post_title'    => $data['title'],
         'post_content'  => $data['content'],
@@ -254,15 +323,20 @@ add_action( 'wp_ajax_dbi_import_post', function () {
     ], true );
 
     if ( is_wp_error( $post_id ) ) {
-        dbi_log( 'ОШИБКА СОЗДАНИЯ ПОСТА: ' . $data['title'] . ' — ' . $post_id->get_error_message() );
+        dbi_log( 'ОШИБКА ПОСТА: ' . $data['title'] . ' — ' . $post_id->get_error_message() );
         wp_send_json_error( $post_id->get_error_message() );
     }
 
-    // Upload and set featured image
     if ( ! empty( $data['image_url'] ) ) {
-        $attachment_id = dbi_upload_image( $data['image_url'], $post_id, $data['image_name'] );
-        if ( $attachment_id && ! is_wp_error( $attachment_id ) ) {
-            set_post_thumbnail( $post_id, $attachment_id );
+        $attach_id = dbi_upload_image( $data['image_url'], $post_id, $data['image_name'] );
+        if ( $attach_id && ! is_wp_error( $attach_id ) ) {
+            set_post_thumbnail( $post_id, $attach_id );
+        }
+    } else {
+        // Картинки нет — использовать logokb.png из медиатеки
+        $default_id = attachment_url_to_postid( 'https://detibaikala38.ru/wp-content/uploads/2026/06/logokb.png' );
+        if ( $default_id ) {
+            set_post_thumbnail( $post_id, $default_id );
         }
     }
 
@@ -284,6 +358,7 @@ add_action( 'wp_ajax_dbi_reset', function () {
     delete_option( DBI_OPTION_URLS );
     delete_option( DBI_OPTION_DONE );
     delete_option( DBI_OPTION_LOG );
+    // DBI_OPTION_ARCHIVE_URL намеренно не удаляем
 
     wp_send_json_success();
 } );
@@ -291,6 +366,152 @@ add_action( 'wp_ajax_dbi_reset', function () {
 // ──────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────
+
+/**
+ * Найти ссылку на следующую страницу пагинации.
+ * Возвращает полный archive.org URL следующей страницы или null.
+ *
+ * Стратегии (по убыванию надёжности):
+ *   1. <a rel="next"> — стандартный WP
+ *   2. Ссылки с классом "next" или текстом »/›
+ *   3. Ссылка на /category/news/page/(N+1)/ где N — текущая страница
+ */
+function dbi_find_next_page( string $html, string $current_url ): ?string {
+    $dom = new DOMDocument();
+    @$dom->loadHTML( mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) );
+    $xpath = new DOMXPath( $dom );
+
+    // 1. rel="next"
+    $node = $xpath->query( '//a[@rel="next"]' )->item( 0 );
+    if ( $node ) {
+        $href = trim( $node->getAttribute( 'href' ) );
+        if ( $href && strpos( $href, 'detibaikala.com' ) !== false ) {
+            return dbi_to_absolute( $href );
+        }
+    }
+
+    // 2. Класс "next" или текст » / ›
+    $candidates = $xpath->query(
+        '//a[contains(@class,"next")] | //li[contains(@class,"next")]//a | //a[normalize-space(.)="»"] | //a[normalize-space(.)="›"]'
+    );
+    foreach ( $candidates as $node ) {
+        $href = trim( $node->getAttribute( 'href' ) );
+        if ( $href && strpos( $href, 'detibaikala.com' ) !== false ) {
+            return dbi_to_absolute( $href );
+        }
+    }
+
+    // 3. Ищем ссылку на page/(N+1)
+    $current_page = 1;
+    if ( preg_match( '~/category/news/page/(\d+)/~', $current_url, $m ) ) {
+        $current_page = (int) $m[1];
+    }
+    $next_page = $current_page + 1;
+
+    $all_links = $xpath->query( '//a[@href]' );
+    foreach ( $all_links as $node ) {
+        $href = trim( $node->getAttribute( 'href' ) );
+        if ( preg_match( '~/category/news/page/' . $next_page . '/~', $href ) ) {
+            return dbi_to_absolute( $href );
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Преобразует href (любой вид) в полный https://web.archive.org URL.
+ */
+function dbi_to_absolute( string $href ): string {
+    if ( ! $href ) return '';
+
+    // Уже полный archive.org URL
+    if ( strpos( $href, 'https://web.archive.org' ) === 0 ) {
+        return $href;
+    }
+
+    // Относительный archive путь: /web/TIMESTAMP/https://...
+    if ( preg_match( '~^/web/\d+~', $href ) ) {
+        return 'https://web.archive.org' . $href;
+    }
+
+    return $href;
+}
+
+/**
+ * Extract article URLs from a category page HTML.
+ *
+ * Card: <div class="card news-item">
+ *         <h5 class="card-title center"><a href="...archive.org...">Title</a></h5>
+ *       </div>
+ */
+function dbi_extract_article_links( string $html ): array {
+    $dom = new DOMDocument();
+    @$dom->loadHTML( mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) );
+    $xpath = new DOMXPath( $dom );
+
+    $links = [];
+
+    $nodes = $xpath->query( '//*[contains(@class,"news-item")]//*[contains(@class,"card-title")]//a[@href]' );
+    if ( ! $nodes || $nodes->length === 0 ) {
+        $nodes = $xpath->query( '//*[contains(@class,"news-item")]//a[@href]' );
+    }
+
+    if ( $nodes ) {
+        foreach ( $nodes as $node ) {
+            $href = trim( $node->getAttribute( 'href' ) );
+            if ( ! $href ) continue;
+
+            $full = dbi_to_absolute( $href );
+            if ( strpos( $full, 'detibaikala.com' ) === false ) continue;
+            if ( ! preg_match( '~detibaikala\.com(/[^?&#\s]+)~', $full, $m ) ) continue;
+
+            $path = rtrim( $m[1], '/' );
+            if ( ! $path ) continue;
+
+            foreach ( [ '/category/', '/tag/', '/author/', '/page/', '/feed/', '/wp-', '/attachment/' ] as $ex ) {
+                if ( strpos( $path, $ex ) !== false ) continue 2;
+            }
+
+            if ( substr_count( $path, '/' ) !== 1 ) continue;
+
+            $links[] = $full;
+        }
+    }
+
+    return array_values( array_unique( $links ) );
+}
+
+/**
+ * Проверка дубля: заголовок + дата + MD5 текста.
+ */
+function dbi_is_duplicate( string $title, string $date, string $content ): bool {
+    $date_str = substr( $date, 0, 10 );
+
+    $query = new WP_Query( [
+        'post_type'      => 'post',
+        'post_status'    => [ 'publish', 'draft', 'private' ],
+        'title'          => $title,
+        'date_query'     => [ [
+            'year'  => (int) substr( $date_str, 0, 4 ),
+            'month' => (int) substr( $date_str, 5, 2 ),
+            'day'   => (int) substr( $date_str, 8, 2 ),
+        ] ],
+        'posts_per_page' => 5,
+        'no_found_rows'  => true,
+    ] );
+
+    if ( ! $query->have_posts() ) return false;
+
+    $new_hash = md5( preg_replace( '/\s+/', ' ', wp_strip_all_tags( $content ) ) );
+
+    foreach ( $query->posts as $post ) {
+        $existing_hash = md5( preg_replace( '/\s+/', ' ', wp_strip_all_tags( $post->post_content ) ) );
+        if ( $existing_hash === $new_hash ) return true;
+    }
+
+    return false;
+}
 
 /**
  * Fetch URL with appropriate headers for archive.org
@@ -313,257 +534,120 @@ function dbi_fetch( string $url ): string|WP_Error {
 }
 
 /**
- * Extract article URLs from a category page HTML.
- * Returns full archive.org URLs.
+ * Parse a single article page.
  *
- * Card structure:
- *   <div class="card news-item">
- *     <h5 class="card-title center"><a href="...">Title</a></h5>
- *   </div>
- */
-function dbi_extract_article_links( string $html ): array {
-    $dom = new DOMDocument();
-    @$dom->loadHTML( mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) );
-    $xpath = new DOMXPath( $dom );
-
-    $links = [];
-
-    // Primary: title links inside .card-title inside .news-item
-    $nodes = $xpath->query( '//*[contains(@class,"news-item")]//*[contains(@class,"card-title")]//a[@href]' );
-
-    // Fallback: any link inside .news-item
-    if ( ! $nodes || $nodes->length === 0 ) {
-        $nodes = $xpath->query( '//*[contains(@class,"news-item")]//a[@href]' );
-    }
-
-    if ( $nodes ) {
-        foreach ( $nodes as $node ) {
-            $href = trim( $node->getAttribute( 'href' ) );
-            if ( ! $href ) continue;
-
-            $normalized = dbi_normalize_url( $href );
-
-            // Must be a detibaikala.com article link (single-slug path)
-            if ( strpos( $normalized, 'detibaikala.com' ) === false ) continue;
-            if ( ! preg_match( '~detibaikala\.com(/[^?&#\s]+)~', $normalized, $m ) ) continue;
-
-            $path = rtrim( $m[1], '/' );
-
-            // Skip system/archive paths
-            if ( ! $path ) continue;
-            foreach ( [ '/category/', '/tag/', '/author/', '/page/', '/feed/', '/wp-', '/attachment/' ] as $ex ) {
-                if ( strpos( $path, $ex ) !== false ) continue 2;
-            }
-
-            // Article slugs are a single path segment: /some-slug
-            if ( substr_count( $path, '/' ) !== 1 ) continue;
-
-            $links[] = $normalized;
-        }
-    }
-
-    return array_values( array_unique( $links ) );
-}
-
-/**
- * Ensure URL is an archive.org absolute URL
- */
-function dbi_normalize_url( string $href ): string {
-    // Already full archive.org URL
-    if ( strpos( $href, 'web.archive.org' ) !== false ) {
-        // Strip /im_/ etc from image paths
-        return $href;
-    }
-
-    // Relative archive path: /web/TIMESTAMP/https://...
-    if ( preg_match( '#^/web/\d+(?:im_)?/https?://#', $href ) ) {
-        return 'https://web.archive.org' . $href;
-    }
-
-    // Absolute URL of original site
-    if ( strpos( $href, 'detibaikala.com' ) !== false ) {
-        $path = parse_url( $href, PHP_URL_PATH );
-        return DBI_BASE_ARCHIVE . '/https://detibaikala.com' . $path;
-    }
-
-    // Relative path
-    if ( strpos( $href, '/' ) === 0 ) {
-        return DBI_BASE_ARCHIVE . '/https://detibaikala.com' . $href;
-    }
-
-    return $href;
-}
-
-/**
- * Parse a single article page and return structured data.
- *
- * Exact structure (from live HTML inspection):
- *   .col-md-9
- *     <h2 style="margin-bottom: 20px">Title</h2>
- *     <div style="color: #a9a9a9; ...">11.5.2024</div>
- *     <div class="center img-thum"><img ...></div>
- *     <p>...</p>
- *     <blockquote class="wp-block-quote ...">...</blockquote>
- *     <figure ...> (excluded)
+ * Structure (.col-md-9):
+ *   <h2 style="margin-bottom: 20px">Title</h2>
+ *   <div style="color: #a9a9a9; ...">11.5.2024</div>
+ *   <div class="center img-thum"><img ...></div>
+ *   <p>...</p>
+ *   <blockquote class="wp-block-quote ...">...</blockquote>
+ *   <figure ...> исключается
  */
 function dbi_parse_article( string $html, string $source_url ): ?array {
     $dom = new DOMDocument();
     @$dom->loadHTML( mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) );
     $xpath = new DOMXPath( $dom );
 
-    // ── Container: .col-md-9 ──
-    $container = $xpath->query( '//*[contains(@class,"col-md-9")]' )->item( 0 );
-    if ( ! $container ) {
-        // Fallback: use body
-        $container = $xpath->query( '//body' )->item( 0 );
-    }
+    $container = $xpath->query( '//*[contains(@class,"col-md-9")]' )->item( 0 )
+              ?? $xpath->query( '//body' )->item( 0 );
 
-    // ── Title: first <h2> inside container ──
+    // Заголовок
     $title = '';
-    $h2 = $xpath->query( './/h2', $container )->item( 0 );
-    if ( $h2 ) {
-        $title = trim( $h2->textContent );
-    }
+    $h2    = $xpath->query( './/h2', $container )->item( 0 );
+    if ( $h2 ) $title = trim( $h2->textContent );
     if ( ! $title ) return null;
 
-    // ── Date: <div style="color: #a9a9a9 ..."> ──
+    // Дата
     $date_raw = '';
-    $divs = $xpath->query( './/div[@style]', $container );
-    foreach ( $divs as $div ) {
-        $style = $div->getAttribute( 'style' );
-        if ( strpos( $style, '#a9a9a9' ) !== false || strpos( $style, 'a9a9a9' ) !== false ) {
+    foreach ( $xpath->query( './/div[@style]', $container ) as $div ) {
+        if ( strpos( $div->getAttribute( 'style' ), 'a9a9a9' ) !== false ) {
             $date_raw = trim( $div->textContent );
             break;
         }
     }
     $date = dbi_parse_date( $date_raw );
 
-    // ── Featured image: div.center.img-thum > img ──
-    $image_url  = '';
-    $image_name = '';
-    $img_node = $xpath->query( './/*[contains(@class,"img-thum")]//img', $container )->item( 0 );
+    // Обложка
+    $image_url = $image_name = '';
+    $img_node  = $xpath->query( './/*[contains(@class,"img-thum")]//img', $container )->item( 0 );
     if ( $img_node ) {
         $src = $img_node->getAttribute( 'src' );
-        if ( $src ) {
-            $image_url = dbi_normalize_image_url( $src );
-        }
+        if ( $src ) $image_url = dbi_normalize_image_url( $src );
     }
-    // Fallback: og:image
     if ( ! $image_url ) {
         $og = $xpath->query( '//meta[@property="og:image"]/@content' )->item( 0 );
-        if ( $og ) {
-            $image_url = dbi_normalize_image_url( $og->nodeValue );
-        }
+        if ( $og ) $image_url = dbi_normalize_image_url( $og->nodeValue );
     }
-    if ( $image_url ) {
-        $image_name = basename( parse_url( $image_url, PHP_URL_PATH ) );
-    }
+    if ( $image_url ) $image_name = basename( parse_url( $image_url, PHP_URL_PATH ) );
 
-    // ── Content: only <p> and <blockquote> (not inside <figure> or <blockquote>) ──
+    // Контент: <p> и <blockquote>, без <figure>
     $content = '';
-    $content_nodes = $xpath->query(
+    foreach ( $xpath->query(
         './/p[not(ancestor::figure) and not(ancestor::blockquote)] | .//blockquote[not(ancestor::figure)]',
         $container
-    );
-    foreach ( $content_nodes as $node ) {
+    ) as $node ) {
         $content .= dbi_node_to_html( $dom, $node );
     }
 
     return compact( 'title', 'date', 'content', 'image_url', 'image_name' );
 }
 
-/**
- * Serialize a DOMNode to HTML string, fixing archive.org image/link URLs
- */
 function dbi_node_to_html( DOMDocument $dom, DOMNode $node ): string {
-    // Fix img src inside this node
-    $imgs = $node->getElementsByTagName( 'img' );
-    foreach ( $imgs as $img ) {
+    foreach ( $node->getElementsByTagName( 'img' ) as $img ) {
         $src = $img->getAttribute( 'src' );
         if ( $src ) $img->setAttribute( 'src', dbi_normalize_image_url( $src ) );
         $img->removeAttribute( 'srcset' );
     }
-
-    // Fix anchor hrefs
-    $anchors = $node->getElementsByTagName( 'a' );
-    foreach ( $anchors as $a ) {
+    foreach ( $node->getElementsByTagName( 'a' ) as $a ) {
         $href = $a->getAttribute( 'href' );
-        if ( preg_match( '#/web/\d+(?:im_)?/(https?://.+)$#', $href, $m ) ) {
+        if ( preg_match( '~/web/\d+(?:im_)?/(https?://.+)$~', $href, $m ) ) {
             $a->setAttribute( 'href', $m[1] );
         }
     }
-
     return $dom->saveHTML( $node );
 }
 
-/**
- * Convert archive.org image URL to a fetchable direct image URL
- */
 function dbi_normalize_image_url( string $src ): string {
     if ( ! $src ) return '';
-
-    // Already absolute non-archive URL
-    if ( strpos( $src, 'web.archive.org' ) === false && strpos( $src, 'http' ) === 0 ) {
-        return $src;
-    }
-
-    // archive.org image URL: /web/TIMESTAMP/https://...  or /web/TIMESTAMPim_/https://...
-    if ( preg_match( '#/web/(\d+)(?:im_)?/(https?://.+)$#', $src, $m ) ) {
-        // Use im_ version to get original image without Wayback Machine toolbar injection
+    if ( strpos( $src, 'web.archive.org' ) === false && strpos( $src, 'http' ) === 0 ) return $src;
+    if ( preg_match( '~/web/(\d+)(?:im_)?/(https?://.+)$~', $src, $m ) ) {
         return 'https://web.archive.org/web/' . $m[1] . 'im_/' . $m[2];
     }
-
-    // Relative path
-    if ( strpos( $src, '/' ) === 0 ) {
-        return 'https://web.archive.org' . $src;
-    }
-
+    if ( strpos( $src, '/' ) === 0 ) return 'https://web.archive.org' . $src;
     return $src;
 }
 
-/**
- * Parse date to MySQL datetime.
- * Handles the site's format: "11.5.2024" (D.M.YYYY or DD.MM.YYYY)
- */
 function dbi_parse_date( string $raw ): string {
     $raw = trim( $raw );
     if ( ! $raw ) return current_time( 'mysql' );
 
-    // Primary format used on site: "11.5.2024" or "1.12.2024"
     if ( preg_match( '/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/', $raw, $m ) ) {
         return sprintf( '%04d-%02d-%02d 00:00:00', $m[3], $m[2], $m[1] );
     }
-
-    // ISO datetime: "2024-05-11" or "2024-05-11T10:00:00"
     if ( preg_match( '/(\d{4}-\d{2}-\d{2})/', $raw, $m ) ) {
         return $m[1] . ' 00:00:00';
     }
 
-    // Russian month names: "11 мая 2024"
-    $ru_months = [
-        'января' => '01', 'февраля' => '02', 'марта' => '03',
-        'апреля' => '04', 'мая' => '05', 'июня' => '06',
-        'июля' => '07', 'августа' => '08', 'сентября' => '09',
-        'октября' => '10', 'ноября' => '11', 'декабря' => '12',
+    $ru = [
+        'января'=>'01','февраля'=>'02','марта'=>'03','апреля'=>'04',
+        'мая'=>'05','июня'=>'06','июля'=>'07','августа'=>'08',
+        'сентября'=>'09','октября'=>'10','ноября'=>'11','декабря'=>'12',
     ];
     $lower = mb_strtolower( $raw );
-    foreach ( $ru_months as $ru => $num ) {
-        if ( strpos( $lower, $ru ) !== false ) {
-            $lower = str_replace( $ru, $num, $lower );
+    foreach ( $ru as $name => $num ) {
+        if ( strpos( $lower, $name ) !== false ) {
+            $lower = str_replace( $name, $num, $lower );
             if ( preg_match( '/(\d{1,2})\s+(\d{2})\s+(\d{4})/', $lower, $m ) ) {
                 return sprintf( '%04d-%02d-%02d 00:00:00', $m[3], $m[2], $m[1] );
             }
         }
     }
 
-    // Last resort
     $ts = strtotime( $raw );
     return $ts ? date( 'Y-m-d H:i:s', $ts ) : current_time( 'mysql' );
 }
 
-/**
- * Download remote image and attach to post
- */
 function dbi_upload_image( string $url, int $post_id, string $filename ): int|WP_Error|false {
     require_once ABSPATH . 'wp-admin/includes/media.php';
     require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -575,25 +659,14 @@ function dbi_upload_image( string $url, int $post_id, string $filename ): int|WP
     ] );
 
     if ( is_wp_error( $response ) ) return $response;
-
-    $code = wp_remote_retrieve_response_code( $response );
-    if ( $code !== 200 ) return false;
+    if ( wp_remote_retrieve_response_code( $response ) !== 200 ) return false;
 
     $body         = wp_remote_retrieve_body( $response );
     $content_type = wp_remote_retrieve_header( $response, 'content-type' );
 
-    // Determine extension from content-type or filename
-    $ext = '';
-    if ( strpos( $content_type, 'jpeg' ) !== false || strpos( $content_type, 'jpg' ) !== false ) {
-        $ext = 'jpg';
-    } elseif ( strpos( $content_type, 'png' ) !== false ) {
-        $ext = 'png';
-    } elseif ( strpos( $content_type, 'webp' ) !== false ) {
-        $ext = 'webp';
-    } elseif ( strpos( $content_type, 'gif' ) !== false ) {
-        $ext = 'gif';
-    } else {
-        $ext = pathinfo( $filename, PATHINFO_EXTENSION ) ?: 'jpg';
+    $ext = 'jpg';
+    foreach ( [ 'jpeg'=>'jpg','jpg'=>'jpg','png'=>'png','webp'=>'webp','gif'=>'gif' ] as $needle => $e ) {
+        if ( strpos( $content_type, $needle ) !== false ) { $ext = $e; break; }
     }
 
     if ( ! $filename ) {
@@ -603,34 +676,24 @@ function dbi_upload_image( string $url, int $post_id, string $filename ): int|WP
     }
 
     $upload = wp_upload_bits( sanitize_file_name( $filename ), null, $body );
-    if ( $upload['error'] ) {
-        return new WP_Error( 'upload_error', $upload['error'] );
-    }
+    if ( $upload['error'] ) return new WP_Error( 'upload_error', $upload['error'] );
 
-    $attachment = [
+    $attach_id = wp_insert_attachment( [
         'post_mime_type' => $content_type,
         'post_title'     => sanitize_file_name( pathinfo( $filename, PATHINFO_FILENAME ) ),
         'post_content'   => '',
         'post_status'    => 'inherit',
-    ];
+    ], $upload['file'], $post_id );
 
-    $attach_id = wp_insert_attachment( $attachment, $upload['file'], $post_id );
     if ( is_wp_error( $attach_id ) ) return $attach_id;
 
-    $attach_data = wp_generate_attachment_metadata( $attach_id, $upload['file'] );
-    wp_update_attachment_metadata( $attach_id, $attach_data );
-
+    wp_update_attachment_metadata( $attach_id, wp_generate_attachment_metadata( $attach_id, $upload['file'] ) );
     return $attach_id;
 }
 
-/**
- * Append to import log (keep last 200 entries)
- */
 function dbi_log( string $message ): void {
     $log   = get_option( DBI_OPTION_LOG, [] );
     $log[] = date( 'Y-m-d H:i:s' ) . ' ' . $message;
-    if ( count( $log ) > 200 ) {
-        $log = array_slice( $log, -200 );
-    }
+    if ( count( $log ) > 200 ) $log = array_slice( $log, -200 );
     update_option( DBI_OPTION_LOG, $log, false );
 }
