@@ -80,6 +80,17 @@ function dbi_admin_page() {
             </div>
         </div>
 
+        <!-- ── Диагностика ── -->
+        <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
+            <h3 style="margin-top:0">Диагностика — проверить URL</h3>
+            <div style="display:flex;gap:8px;align-items:flex-start">
+                <input id="dbi-debug-url" type="url" style="width:560px" class="regular-text"
+                       placeholder="https://web.archive.org/web/.../...">
+                <button id="btn-debug" class="button">Проверить</button>
+            </div>
+            <pre id="dbi-debug-result" style="margin-top:8px;background:#f0f0f0;padding:8px;font-size:12px;white-space:pre-wrap;display:none"></pre>
+        </div>
+
         <?php if ( ! empty( $log ) ): ?>
             <h3>Лог (последние 50 записей)</h3>
             <div style="max-height:300px;overflow-y:auto;background:#f9f9f9;padding:10px;font-size:12px;font-family:monospace">
@@ -177,6 +188,21 @@ function dbi_admin_page() {
             });
         });
 
+        // ── Диагностика ──
+        $('#btn-debug').on('click', function(){
+            const url = $('#dbi-debug-url').val().trim();
+            if (!url) { alert('Введите URL'); return; }
+            $(this).prop('disabled', true).text('Загружаю...');
+            $('#dbi-debug-result').hide().text('');
+            $.post(ajax, {action:'dbi_debug_fetch', nonce, url}, function(r){
+                $('#btn-debug').prop('disabled', false).text('Проверить');
+                $('#dbi-debug-result').show().text(JSON.stringify(r.data || r, null, 2));
+            }).fail(function(){
+                $('#btn-debug').prop('disabled', false).text('Проверить');
+                $('#dbi-debug-result').show().text('Ошибка сети');
+            });
+        });
+
         function dbiRefreshStep2() {
             $.post(ajax, {action:'dbi_get_status', nonce}, function(r){
                 if (!r.success) return;
@@ -255,6 +281,71 @@ add_action( 'wp_ajax_dbi_collect_page', function () {
     wp_send_json_success( [
         'found' => count( $links ),
         'total' => count( $merged ),
+    ] );
+} );
+
+// ──────────────────────────────────────────────
+// AJAX: Debug — fetch URL and return raw diagnostic info
+// ──────────────────────────────────────────────
+
+add_action( 'wp_ajax_dbi_debug_fetch', function () {
+    check_ajax_referer( 'dbi_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_die();
+
+    $url = esc_url_raw( $_POST['url'] ?? '' );
+    if ( ! $url ) wp_send_json_error( 'Пустой URL' );
+
+    $response = wp_remote_get( $url, [
+        'timeout'             => 30,
+        'user-agent'          => 'Mozilla/5.0 (compatible; WordPress importer)',
+        'headers'             => [ 'Accept-Encoding' => 'identity' ],
+        'redirection'         => 5,
+        'reject_unsafe_urls'  => false,
+    ] );
+
+    if ( is_wp_error( $response ) ) {
+        wp_send_json_error( 'WP_Error: ' . $response->get_error_message() );
+    }
+
+    $code        = wp_remote_retrieve_response_code( $response );
+    $final_url   = '';
+    if ( isset( $response['http_response'] ) ) {
+        $final_url = method_exists( $response['http_response'], 'get_response_object' )
+            ? (string) $response['http_response']->get_response_object()->url
+            : '';
+    }
+    $body = wp_remote_retrieve_body( $response );
+    $len  = strlen( $body );
+
+    $dom = new DOMDocument();
+    @$dom->loadHTML( mb_convert_encoding( $body, 'HTML-ENTITIES', 'UTF-8' ) );
+    $xpath = new DOMXPath( $dom );
+
+    $has_col_md9 = $xpath->query( '//*[contains(@class,"col-md-9")]' )->length;
+    $h2_nodes    = $xpath->query( '//h2' );
+    $h2_texts    = [];
+    foreach ( $h2_nodes as $node ) {
+        $h2_texts[] = mb_substr( trim( $node->textContent ), 0, 80 );
+    }
+
+    $h1_nodes = $xpath->query( '//h1' );
+    $h1_texts = [];
+    foreach ( $h1_nodes as $node ) {
+        $h1_texts[] = mb_substr( trim( $node->textContent ), 0, 80 );
+    }
+
+    $title_node = $xpath->query( '//title' )->item( 0 );
+    $page_title = $title_node ? trim( $title_node->textContent ) : '';
+
+    wp_send_json_success( [
+        'http_code'    => $code,
+        'final_url'    => $final_url,
+        'body_length'  => $len,
+        'page_title'   => $page_title,
+        'has_col_md9'  => $has_col_md9,
+        'h1'           => $h1_texts,
+        'h2'           => $h2_texts,
+        'body_snippet' => mb_substr( $body, 0, 500 ),
     ] );
 } );
 
