@@ -39,62 +39,49 @@ function dbi_admin_page() {
     <div class="wrap">
         <h1>Импорт новостей с detibaikala.com</h1>
 
-        <!-- ── Настройки URL ── -->
+        <!-- ── Шаг 1: сбор ссылок со страницы ── -->
         <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
-            <h3 style="margin-top:0">URL первой страницы категории (archive.org)</h3>
+            <h3 style="margin-top:0">Шаг 1 — Собрать ссылки с одной страницы</h3>
             <p style="color:#666;margin-top:0;margin-bottom:8px">
-                Вставьте ссылку на <strong>первую страницу</strong> категории новостей из нужного снимка.<br>
-                Плагин сам перейдёт по ссылкам пагинации до последней страницы.<br>
-                Пример: <code>https://web.archive.org/web/20241214102943/https://detibaikala.com/category/news/</code>
+                Вставьте ссылку на любую страницу категории из archive.org и нажмите «Собрать».<br>
+                Повторите для каждой нужной страницы вручную.<br>
+                <em>Пример: <code>https://web.archive.org/web/20241214102943/https://detibaikala.com/category/news/</code></em>
             </p>
-            <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;gap:8px;align-items:flex-start">
                 <input id="dbi-archive-url" type="url" value="<?= esc_attr( $archive_url ) ?>"
-                       style="width:540px" class="regular-text"
+                       style="width:560px" class="regular-text"
                        placeholder="https://web.archive.org/web/TIMESTAMP/https://detibaikala.com/category/news/">
-                <button id="btn-save-url" class="button button-primary">Сохранить</button>
+                <button id="btn-collect" class="button button-primary">Собрать ссылки</button>
             </div>
-            <?php if ( $archive_url ): ?>
-                <p style="margin-bottom:0;color:#2a7a2a;margin-top:8px">
-                    ✓ Сохранено: <code><?= esc_html( $archive_url ) ?></code>
-                </p>
-            <?php endif; ?>
+            <p id="dbi-collect-status" style="margin-bottom:0;margin-top:8px;min-height:20px"></p>
         </div>
 
-        <?php if ( ! $archive_url ): ?>
-            <p style="color:#c00"><strong>Укажите URL первой страницы категории выше, чтобы начать.</strong></p>
-        <?php else: ?>
-
+        <!-- ── Шаг 2: импорт ── -->
+        <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
+            <h3 style="margin-top:0">Шаг 2 — Импортировать собранные статьи</h3>
             <p>
-                <strong>Шаг 1:</strong> Собрать ссылки на статьи (плагин сам обходит все страницы пагинации).<br>
-                <strong>Шаг 2:</strong> Импортировать статьи по одной.
+                Собрано ссылок: <strong><?= $total ?></strong><br>
+                Импортировано: <strong><?= $done_cnt ?></strong> / <?= $total ?><br>
+                Осталось: <strong><?= count( $remaining ) ?></strong>
             </p>
 
-            <?php if ( $total === 0 ): ?>
-                <p>Ссылки ещё не собраны.</p>
-                <button id="btn-collect" class="button button-primary">Шаг 1: Собрать ссылки</button>
+            <?php if ( count( $remaining ) > 0 ): ?>
+                <button id="btn-import" class="button button-primary">Импортировать</button>
+                <button id="btn-stop" class="button" style="display:none;margin-left:8px">Остановить</button>
+            <?php elseif ( $total > 0 ): ?>
+                <p style="color:green;margin:0"><strong>Все собранные статьи импортированы!</strong></p>
             <?php else: ?>
-                <p>
-                    Собрано ссылок: <strong><?= $total ?></strong><br>
-                    Импортировано: <strong><?= $done_cnt ?></strong> / <?= $total ?><br>
-                    Осталось: <strong><?= count( $remaining ) ?></strong>
-                </p>
-                <?php if ( count( $remaining ) > 0 ): ?>
-                    <button id="btn-import" class="button button-primary">Шаг 2: Импортировать</button>
-                    <button id="btn-stop" class="button" style="display:none">Остановить</button>
-                <?php else: ?>
-                    <p style="color:green"><strong>Импорт завершён!</strong></p>
-                <?php endif; ?>
-                <button id="btn-collect-more" class="button" style="margin-left:10px">Собрать ещё ссылки</button>
-                <button id="btn-reset" class="button button-secondary" style="margin-left:10px">Сбросить всё</button>
+                <p style="color:#888;margin:0">Сначала соберите ссылки на шаге 1.</p>
             <?php endif; ?>
 
-        <?php endif; ?>
+            <button id="btn-reset" class="button button-secondary" style="margin-left:<?= count($remaining) > 0 ? '20' : '0' ?>px">Сбросить всё</button>
 
-        <div id="dbi-progress" style="margin-top:15px;display:none">
-            <div style="background:#e0e0e0;height:20px;border-radius:4px;width:500px">
-                <div id="dbi-bar" style="background:#0073aa;height:20px;border-radius:4px;width:0;transition:width 0.3s"></div>
+            <div id="dbi-import-progress" style="margin-top:12px;display:none">
+                <div style="background:#e0e0e0;height:20px;border-radius:4px;width:500px">
+                    <div id="dbi-bar" style="background:#0073aa;height:20px;border-radius:4px;width:0;transition:width 0.3s"></div>
+                </div>
+                <p id="dbi-import-status" style="margin-bottom:0"></p>
             </div>
-            <p id="dbi-status"></p>
         </div>
 
         <?php if ( ! empty( $log ) ): ?>
@@ -109,67 +96,42 @@ function dbi_admin_page() {
 
     <script>
     (function($){
-        const ajax       = '<?= admin_url('admin-ajax.php') ?>';
-        const nonce      = '<?= wp_create_nonce('dbi_nonce') ?>';
-        const startUrl   = <?= json_encode( $archive_url ) ?>;
-        let running      = false;
+        const ajax  = '<?= admin_url('admin-ajax.php') ?>';
+        const nonce = '<?= wp_create_nonce('dbi_nonce') ?>';
+        let running = false;
 
-        // ── Сохранить URL ──
-        $('#btn-save-url').on('click', function(){
+        // ── Шаг 1: собрать ссылки с одной страницы ──
+        $('#btn-collect').on('click', function(){
             const url = $('#dbi-archive-url').val().trim();
-            if (!url) { alert('Введите URL'); return; }
-            $(this).prop('disabled', true).text('Сохранение...');
-            $.post(ajax, {action:'dbi_save_settings', nonce, archive_url: url}, function(r){
+            if (!url) { alert('Введите URL страницы'); return; }
+            if (url.indexOf('web.archive.org') === -1) {
+                alert('URL должен быть с web.archive.org');
+                return;
+            }
+
+            $(this).prop('disabled', true).text('Сбор...');
+            $('#dbi-collect-status').css('color','#666').text('Загружаю страницу...');
+
+            // Сохраняем URL в настройках (чтобы остался в поле после перезагрузки)
+            $.post(ajax, {action:'dbi_save_settings', nonce, archive_url: url});
+
+            $.post(ajax, {action:'dbi_collect_page', nonce, url}, function(r){
+                $('#btn-collect').prop('disabled', false).text('Собрать ссылки');
                 if (r.success) {
-                    location.reload();
+                    $('#dbi-collect-status').css('color','#2a7a2a').text(
+                        '✓ Найдено новых ссылок на этой странице: ' + r.data.found +
+                        '. Всего собрано: ' + r.data.total + '.'
+                    );
                 } else {
-                    alert('Ошибка: ' + r.data);
-                    $('#btn-save-url').prop('disabled', false).text('Сохранить');
+                    $('#dbi-collect-status').css('color','red').text('Ошибка: ' + r.data);
                 }
+            }).fail(function(){
+                $('#btn-collect').prop('disabled', false).text('Собрать ссылки');
+                $('#dbi-collect-status').css('color','red').text('Ошибка сети. Попробуйте ещё раз.');
             });
         });
 
-        // ── Сбор ссылок: обход пагинации ──
-        function startCollect() {
-            $('#btn-collect, #btn-collect-more').prop('disabled', true).text('Сбор...');
-            $('#dbi-progress').show();
-            $('#dbi-bar').css('width', '0');
-            collectPage(startUrl, 1, 0);
-        }
-        $('#btn-collect').on('click', startCollect);
-        $('#btn-collect-more').on('click', startCollect);
-
-        // url  — полный archive.org URL текущей страницы пагинации
-        // pageNum — номер страницы для отображения
-        // totalFound — сколько ссылок нашли за все предыдущие страницы
-        function collectPage(url, pageNum, totalFound) {
-            $.post(ajax, {action:'dbi_collect_page', nonce, url}, function(r){
-                if (!r.success) {
-                    $('#dbi-status').html('<span style="color:red">Ошибка (стр.' + pageNum + '): ' + r.data + '</span>');
-                    setTimeout(function(){ collectPage(url, pageNum, totalFound); }, 5000);
-                    return;
-                }
-                totalFound += r.data.found;
-                $('#dbi-status').text(
-                    'Страница ' + pageNum + ' — найдено ' + r.data.found + ' ссылок. Всего: ' + totalFound
-                );
-                // Анимация: пульсирующий прогресс без известного максимума
-                const w = Math.min(95, 10 + pageNum * 1.5);
-                $('#dbi-bar').css('width', w + '%');
-
-                if (r.data.next_url) {
-                    collectPage(r.data.next_url, pageNum + 1, totalFound);
-                } else {
-                    $('#dbi-bar').css('width', '100%');
-                    $('#dbi-status').text('Готово! Всего ссылок найдено: ' + totalFound + '. Перезагружаю...');
-                    setTimeout(function(){ location.reload(); }, 1500);
-                }
-            }).fail(function(){
-                setTimeout(function(){ collectPage(url, pageNum, totalFound); }, 5000);
-            });
-        }
-
-        // ── Импорт ──
+        // ── Шаг 2: импорт ──
         let importQueue   = <?= json_encode( $remaining ) ?>;
         let importedCount = <?= $done_cnt ?>;
         let grandTotal    = <?= $total ?>;
@@ -178,7 +140,7 @@ function dbi_admin_page() {
             running = true;
             $(this).hide();
             $('#btn-stop').show();
-            $('#dbi-progress').show();
+            $('#dbi-import-progress').show();
             processNext();
         });
 
@@ -186,13 +148,13 @@ function dbi_admin_page() {
             running = false;
             $(this).hide();
             $('#btn-import').show();
-            $('#dbi-status').text('Остановлено. Прогресс сохранён.');
+            $('#dbi-import-status').text('Остановлено. Прогресс сохранён.');
         });
 
         function processNext() {
             if (!running || importQueue.length === 0) {
                 if (importQueue.length === 0) {
-                    $('#dbi-status').text('Импорт завершён!');
+                    $('#dbi-import-status').text('Импорт завершён!');
                     setTimeout(function(){ location.reload(); }, 1500);
                 }
                 return;
@@ -202,7 +164,7 @@ function dbi_admin_page() {
                 importedCount++;
                 const icon = r.success ? '✓' : '✗';
                 const msg  = r.success ? r.data.title : (url + ' → ' + r.data);
-                $('#dbi-status').text('[' + importedCount + '/' + grandTotal + '] ' + icon + ' ' + msg);
+                $('#dbi-import-status').text('[' + importedCount + '/' + grandTotal + '] ' + icon + ' ' + msg);
                 $('#dbi-bar').css('width', Math.round(importedCount / grandTotal * 100) + '%');
                 setTimeout(processNext, 800);
             }).fail(function(){
@@ -212,7 +174,7 @@ function dbi_admin_page() {
         }
 
         $('#btn-reset').on('click', function(){
-            if (!confirm('Сбросить весь прогресс и собранные ссылки? URL архива останется.')) return;
+            if (!confirm('Сбросить весь прогресс и собранные ссылки?')) return;
             $.post(ajax, {action:'dbi_reset', nonce}, function(){
                 location.reload();
             });
@@ -260,20 +222,14 @@ add_action( 'wp_ajax_dbi_collect_page', function () {
         wp_send_json_error( $html->get_error_message() );
     }
 
-    // Статьи с текущей страницы
-    $links = dbi_extract_article_links( $html );
-
-    // Сохраняем (дедупликация)
+    $links    = dbi_extract_article_links( $html );
     $existing = get_option( DBI_OPTION_URLS, [] );
     $merged   = array_values( array_unique( array_merge( $existing, $links ) ) );
     update_option( DBI_OPTION_URLS, $merged, false );
 
-    // Следующая страница пагинации (archive.org ссылка с её timestamp)
-    $next_url = dbi_find_next_page( $html, $url );
-
     wp_send_json_success( [
-        'found'    => count( $links ),
-        'next_url' => $next_url,
+        'found' => count( $links ),
+        'total' => count( $merged ),
     ] );
 } );
 
