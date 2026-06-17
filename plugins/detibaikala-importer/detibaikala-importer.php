@@ -429,9 +429,19 @@ add_action( 'wp_ajax_dbi_import_post', function () {
         }
     } else {
         // Картинки нет — использовать logokb.png из медиатеки
-        $default_id = attachment_url_to_postid( 'https://detibaikala38.ru/wp-content/uploads/2026/06/logokb.png' );
-        if ( $default_id ) {
-            set_post_thumbnail( $post_id, $default_id );
+        $q = new WP_Query( [
+            'post_type'      => 'attachment',
+            'post_status'    => 'inherit',
+            'posts_per_page' => 1,
+            'no_found_rows'  => true,
+            'meta_query'     => [ [
+                'key'     => '_wp_attached_file',
+                'value'   => 'logokb.png',
+                'compare' => 'LIKE',
+            ] ],
+        ] );
+        if ( $q->have_posts() ) {
+            set_post_thumbnail( $post_id, $q->posts[0]->ID );
         }
     }
 
