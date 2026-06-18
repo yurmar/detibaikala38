@@ -253,7 +253,7 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 .team-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
 .team-modal.is-open{visibility:visible;opacity:1}
 .team-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
-.team-modal__box{position:relative;background:var(--bg-card);border-radius:16px;border:1px solid var(--border);padding:2rem;max-width:420px;width:calc(100% - 2rem);text-align:center;z-index:1;transform:translateY(20px);transition:transform .2s}
+.team-modal__box{position:relative;background:var(--bg-card);border-radius:16px;border:1px solid var(--border);padding:2rem;max-width:600px;width:calc(100% - 2rem);max-height:calc(100vh - 3rem);overflow-y:auto;text-align:center;z-index:1;transform:translateY(20px);transition:transform .2s}
 .team-modal.is-open .team-modal__box{transform:translateY(0)}
 .team-modal__close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;line-height:1;padding:.25rem;cursor:pointer;color:var(--text-muted)}
 .team-modal__close:hover{color:var(--text-primary)}
