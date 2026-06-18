@@ -13,7 +13,7 @@ while ( have_posts() ) :
   <main class="page-main">
     <div class="section-label"><?php esc_html_e( 'Фонд', 'deti-baikala' ); ?></div>
     <h1 class="page-title"><?php the_title(); ?></h1>
-    <?php if ( get_the_excerpt() ) : ?>
+    <?php if ( has_excerpt() ) : ?>
       <p class="page-subtitle"><?php echo esc_html( get_the_excerpt() ); ?></p>
     <?php endif; ?>
 
