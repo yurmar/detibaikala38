@@ -410,18 +410,18 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 .leyka-campaigns-list .leyka-campaign-item:hover{border-color:var(--border);transform:translateY(-3px);box-shadow:var(--shadow)}
 /* Sidebar: виджет «Список кампаний» — стиль по шаблону about.html */
 .sidebar-widget .leyka-campaigns-list{display:flex;flex-direction:column;gap:0}
-.sidebar-widget div[id*="leyka_campaign_list_widget"]{border:none}
-.sidebar-widget .leyka-campaign-list-item{padding:0.75rem 0;border-bottom:1px solid var(--border-subtle);margin:0;display:flex;flex-direction:column;gap:0.4rem}
-.sidebar-widget .leyka-campaign-list-item:last-child{border-bottom:none;padding-bottom:0}
+.sidebar-widget div[id*="leyka_campaign_list_widget"]{border:none!important}
+.sidebar-widget .leyka-campaign-list-item{padding:0.75rem 0!important;border-top:none!important;border-bottom:1px solid var(--border-subtle)!important;margin:0!important;display:flex;flex-direction:column;gap:0.4rem}
+.sidebar-widget .leyka-campaign-list-item:last-child{border-bottom:none!important;padding-bottom:0!important}
 .sidebar-widget .lk-thumbnail{display:none}
 .sidebar-widget .lk-info{padding:0!important}
 .sidebar-widget .lk-info p{display:none}
 .sidebar-widget .lk-title{font-size:0.8rem!important;font-weight:600!important;line-height:1.3!important;margin:0!important;clear:none!important}
 .sidebar-widget .lk-title a,.sidebar-widget .lk-title a:visited{color:var(--text-primary)!important;text-decoration:none}
 .sidebar-widget .lk-title a:hover{color:var(--accent)!important}
-.sidebar-widget .leyka-scale{padding:0!important;border-top:none!important}
-.sidebar-widget .leyka-scale-compact{display:flex;flex-direction:column;gap:0.4rem}
-.sidebar-widget .leyka-scale-scale{height:4px!important;border-radius:2px!important;background:var(--bg-secondary)!important;overflow:hidden;width:100%}
+.sidebar-widget .leyka-scale{padding:0!important;border-top:none!important;margin-top:0!important;clear:none!important}
+.sidebar-widget .leyka-scale-compact{display:flex;flex-direction:column;gap:0.35rem}
+.sidebar-widget .leyka-scale-scale{height:4px!important;border-radius:2px!important;background:var(--bg-secondary)!important;overflow:hidden!important;width:100%!important;margin:0!important}
 .sidebar-widget .leyka-scale-scale .target{background:transparent!important;height:100%!important;width:100%!important}
 .sidebar-widget .leyka-scale-scale .collected{background:linear-gradient(90deg,var(--accent),#00E5B8)!important;height:100%!important}
 .sidebar-widget .leyka-scale-label{font-size:0.7rem!important;color:var(--text-muted)!important;margin:0!important;line-height:1.3}
