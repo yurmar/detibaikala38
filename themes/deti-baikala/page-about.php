@@ -85,10 +85,13 @@ while ( have_posts() ) :
       </div>
     <?php endif; ?>
 
-    <?php if ( db_leyka_active() ) : ?>
+    <?php
+    $donate_campaign_id = absint( get_post_meta( get_the_ID(), '_db_donate_campaign_id', true ) );
+    if ( db_leyka_active() && $donate_campaign_id ) :
+    ?>
       <div class="donate-form" id="donate">
         <h3><?php esc_html_e( 'Сделать пожертвование', 'deti-baikala' ); ?></h3>
-        <?php echo do_shortcode( '[leyka_donation_form]' ); ?>
+        <?php echo do_shortcode( '[leyka_donation_form campaign="' . $donate_campaign_id . '"]' ); ?>
       </div>
     <?php endif; ?>
   </main>
