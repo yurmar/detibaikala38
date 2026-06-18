@@ -7,6 +7,11 @@
 ?>
 <aside class="sidebar">
 
+  <?php // ── Дополнительные виджеты из WP-admin ──────────────────── ?>
+  <?php if ( is_active_sidebar( 'sidebar-page' ) ) : ?>
+    <?php dynamic_sidebar( 'sidebar-page' ); ?>
+  <?php endif; ?>
+
   <?php // ── Последние новости ─────────────────────────────────────── ?>
   <div class="sidebar-widget">
     <div class="sidebar-widget__title"><?php esc_html_e( 'Последние новости', 'deti-baikala' ); ?></div>
@@ -65,11 +70,6 @@
     wp_reset_postdata();
     ?>
   </div>
-  <?php endif; ?>
-
-  <?php // ── Дополнительные виджеты из WP-admin ──────────────────── ?>
-  <?php if ( is_active_sidebar( 'sidebar-page' ) ) : ?>
-    <?php dynamic_sidebar( 'sidebar-page' ); ?>
   <?php endif; ?>
 
 </aside>
