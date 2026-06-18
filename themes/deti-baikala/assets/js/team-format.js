@@ -29,7 +29,7 @@
 			var setMembers   = membersState[1];
 
 			useEffect(function () {
-				wp.apiFetch({ path: '/wp/v2/team_member?per_page=100&orderby=menu_order&order=asc' })
+				wp.apiFetch({ path: '/wp/v2/team_member?per_page=100&orderby=title&order=asc' })
 					.then(function (data) { setMembers(data); })
 					.catch(function () {});
 			}, []);
