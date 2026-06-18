@@ -136,7 +136,7 @@ $news_query = new WP_Query(
     array(
         'post_type'      => 'post',
         'posts_per_page' => 3,
-        'category_name'  => 'novosti',
+        'category_name'  => 'news',
     )
 );
 if ( $news_query->have_posts() ) :
@@ -160,7 +160,7 @@ if ( $news_query->have_posts() ) :
       ?>
     </div>
     <div style="text-align:center;margin-top:2.5rem" class="reveal">
-      <a href="<?php echo esc_url( get_post_type_archive_link( 'post' ) ? get_post_type_archive_link( 'post' ) : get_permalink( get_option( 'page_for_posts' ) ) ); ?>" class="btn btn-outline"><?php esc_html_e( 'Все новости', 'deti-baikala' ); ?></a>
+      <a href="/category/news/" class="btn btn-outline"><?php esc_html_e( 'Все новости', 'deti-baikala' ); ?></a>
     </div>
   </div>
 </section>
