@@ -3,7 +3,7 @@
 	var applyFormat        = wp.richText.applyFormat;
 	var removeFormat       = wp.richText.removeFormat;
 	var RichTextToolbarButton = wp.blockEditor.RichTextToolbarButton;
-	var Popover  = wp.components.Popover;
+	var Modal    = wp.components.Modal;
 	var Button   = wp.components.Button;
 	var useState = wp.element.useState;
 	var useEffect = wp.element.useEffect;
@@ -44,17 +44,16 @@
 					isActive: isActive,
 				}),
 				visible && el(
-					Popover,
-					{ onClose: function () { setVisible(false); }, className: 'db-team-format-popover' },
-					el('div', { style: { padding: '8px', minWidth: '220px' } },
-						el('p', { style: { fontWeight: 600, margin: '0 4px 8px', fontSize: '12px', textTransform: 'uppercase', color: '#aaa' } }, 'Выберите сотрудника'),
-						members.length === 0
-							? el('p', { style: { padding: '4px 8px', color: '#888', fontSize: '13px' } }, 'Загрузка...')
-							: members.map(function (m) {
+					Modal,
+					{ title: 'Выберите сотрудника', onRequestClose: function () { setVisible(false); }, style: { maxWidth: '360px' } },
+					members.length === 0
+						? el('p', { style: { color: '#888', fontSize: '13px', margin: 0 } }, 'Загрузка...')
+						: el('div', null,
+							members.map(function (m) {
 								return el(Button, {
 									key: m.id,
 									variant: 'tertiary',
-									style: { display: 'block', width: '100%', textAlign: 'left', marginBottom: '2px' },
+									style: { display: 'block', width: '100%', textAlign: 'left', marginBottom: '4px' },
 									onClick: function () {
 										onChange(applyFormat(value, {
 											type: 'deti-baikala/team-link',
@@ -64,18 +63,18 @@
 									},
 								}, m.title.rendered);
 							}),
-						isActive && el('div', { style: { borderTop: '1px solid #eee', marginTop: '6px', paddingTop: '6px' } },
-							el(Button, {
-								variant: 'tertiary',
-								isDestructive: true,
-								style: { display: 'block', width: '100%', textAlign: 'left' },
-								onClick: function () {
-									onChange(removeFormat(value, 'deti-baikala/team-link'));
-									setVisible(false);
-								},
-							}, 'Убрать ссылку')
+							isActive && el('div', { style: { borderTop: '1px solid #e0e0e0', marginTop: '8px', paddingTop: '8px' } },
+								el(Button, {
+									variant: 'tertiary',
+									isDestructive: true,
+									style: { display: 'block', width: '100%', textAlign: 'left' },
+									onClick: function () {
+										onChange(removeFormat(value, 'deti-baikala/team-link'));
+										setVisible(false);
+									},
+								}, 'Убрать ссылку')
+							)
 						)
-					)
 				)
 			);
 		},
