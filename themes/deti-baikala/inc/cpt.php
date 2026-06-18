@@ -88,6 +88,8 @@ function db_register_post_types() {
 			'publicly_queryable' => false,
 			'show_ui'            => true,
 			'show_in_menu'       => true,
+			'show_in_rest'       => true,
+			'rest_base'          => 'team_member',
 			'has_archive'        => false,
 			'menu_icon'          => 'dashicons-groups',
 			'supports'           => array( 'title', 'thumbnail' ),

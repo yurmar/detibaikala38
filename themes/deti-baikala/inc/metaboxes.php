@@ -285,11 +285,10 @@ db_register_metabox(
 			'description' => __( 'Например: Директор фонда', 'deti-baikala' ),
 		),
 		array(
-			'key'         => '_team_avatar_emoji',
-			'label'       => __( 'Эмодзи-плейсхолдер', 'deti-baikala' ),
-			'type'        => 'emoji',
-			'default'     => '🧑',
-			'description' => __( 'Используется, если фото не загружено.', 'deti-baikala' ),
+			'key'         => '_team_description',
+			'label'       => __( 'Описание', 'deti-baikala' ),
+			'type'        => 'textarea',
+			'description' => __( 'Краткая биография или описание сотрудника. Отображается в модальном окне.', 'deti-baikala' ),
 		),
 	)
 );

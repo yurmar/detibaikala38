@@ -77,11 +77,48 @@ function db_enqueue_assets() {
 
 	wp_enqueue_script( 'deti-baikala-main', DB_THEME_URI . '/assets/js/main.js', array(), DB_THEME_VERSION, true );
 
+	if ( is_page_template( 'page-about.php' ) ) {
+		wp_enqueue_script( 'db-team-modal', DB_THEME_URI . '/assets/js/team-modal.js', array(), DB_THEME_VERSION, true );
+	}
+
 	if ( is_singular() && comments_open() ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'db_enqueue_assets' );
+
+function db_enqueue_block_editor_assets() {
+	wp_enqueue_script(
+		'db-team-format',
+		DB_THEME_URI . '/assets/js/team-format.js',
+		array( 'wp-rich-text', 'wp-block-editor', 'wp-components', 'wp-element', 'wp-api-fetch' ),
+		DB_THEME_VERSION,
+		true
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'db_enqueue_block_editor_assets' );
+
+function db_register_team_meta() {
+	register_post_meta(
+		'team_member',
+		'_team_role',
+		array(
+			'type'         => 'string',
+			'single'       => true,
+			'show_in_rest' => true,
+		)
+	);
+	register_post_meta(
+		'team_member',
+		'_team_description',
+		array(
+			'type'         => 'string',
+			'single'       => true,
+			'show_in_rest' => true,
+		)
+	);
+}
+add_action( 'init', 'db_register_team_meta' );
 
 /**
  * Preconnect-хинты для Google Fonts.

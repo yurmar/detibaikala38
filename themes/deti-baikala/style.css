@@ -242,11 +242,26 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 .about-text-wrap a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 .about-text-wrap a:hover{opacity:0.8}
 .team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.5rem;margin:2rem 0}
-.team-card{text-align:center}
-.team-card__photo{width:120px;height:120px;border-radius:50%;margin:0 auto 0.75rem;background:linear-gradient(135deg,var(--bg-secondary),var(--bg-card-hover));border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--text-muted);overflow:hidden}
+.team-card{text-align:center;cursor:pointer;transition:transform var(--transition)}
+.team-card:hover{transform:translateY(-3px)}
+.team-card__photo{width:120px;height:120px;border-radius:50%;margin:0 auto 0.75rem;background:linear-gradient(135deg,var(--bg-secondary),var(--bg-card-hover));border:2px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .team-card__photo img{width:100%;height:100%;object-fit:cover}
 .team-card__name{font-family:'Montserrat',sans-serif;font-size:0.88rem;font-weight:700;margin-bottom:0.25rem}
 .team-card__role{font-size:0.75rem;color:var(--text-muted)}
+.team-link{cursor:pointer;border-bottom:1px dashed var(--accent);color:inherit;text-decoration:none}
+.team-link:hover{border-bottom-style:solid;color:var(--accent)}
+.team-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
+.team-modal.is-open{visibility:visible;opacity:1}
+.team-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.team-modal__box{position:relative;background:var(--bg-card);border-radius:16px;border:1px solid var(--border);padding:2rem;max-width:420px;width:calc(100% - 2rem);text-align:center;z-index:1;transform:translateY(20px);transition:transform .2s}
+.team-modal.is-open .team-modal__box{transform:translateY(0)}
+.team-modal__close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;line-height:1;padding:.25rem;cursor:pointer;color:var(--text-muted)}
+.team-modal__close:hover{color:var(--text-primary)}
+.team-modal__photo{width:140px;height:140px;border-radius:50%;margin:0 auto 1.25rem;background:linear-gradient(135deg,var(--bg-secondary),var(--bg-card-hover));border:2px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.team-modal__photo img{width:100%;height:100%;object-fit:cover}
+.team-modal__name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.35rem}
+.team-modal__role{font-size:.82rem;color:var(--accent);font-weight:600;margin-bottom:1rem}
+.team-modal__desc{font-size:.88rem;color:var(--text-secondary);line-height:1.65;text-align:left;white-space:pre-line}
 .docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin:2rem 0}
 .doc-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:1.25rem;text-align:center;transition:all var(--transition);cursor:pointer;display:block}
 .doc-card:hover{border-color:var(--accent);transform:translateY(-2px)}

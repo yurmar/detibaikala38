@@ -31,22 +31,45 @@ while ( have_posts() ) :
         )
     );
     if ( $team->have_posts() ) :
+        $team_members = array();
+        while ( $team->have_posts() ) {
+            $team->the_post();
+            $mid = get_the_ID();
+            $team_members[] = array(
+                'id'    => $mid,
+                'name'  => get_the_title(),
+                'role'  => get_post_meta( $mid, '_team_role', true ) ?: '',
+                'desc'  => get_post_meta( $mid, '_team_description', true ) ?: '',
+                'photo' => get_the_post_thumbnail_url( $mid, 'medium' ) ?: '',
+            );
+        }
+        wp_reset_postdata();
     ?>
       <h2 style="margin-bottom:1.5rem;margin-top:3rem"><?php esc_html_e( 'Наша команда', 'deti-baikala' ); ?></h2>
       <div class="team-grid">
-        <?php while ( $team->have_posts() ) : $team->the_post(); ?>
-          <div class="team-card">
+        <?php foreach ( $team_members as $m ) : ?>
+          <div class="team-card" data-member-id="<?php echo esc_attr( $m['id'] ); ?>">
             <div class="team-card__photo">
-              <?php if ( has_post_thumbnail() ) : ?>
-                <?php the_post_thumbnail( 'thumbnail' ); ?>
-              <?php else : ?>
-                <?php echo esc_html( get_post_meta( get_the_ID(), '_team_avatar_emoji', true ) ?: '🧑' ); ?>
+              <?php if ( $m['photo'] ) : ?>
+                <img src="<?php echo esc_url( $m['photo'] ); ?>" alt="<?php echo esc_attr( $m['name'] ); ?>">
               <?php endif; ?>
             </div>
-            <div class="team-card__name"><?php the_title(); ?></div>
-            <div class="team-card__role"><?php echo esc_html( get_post_meta( get_the_ID(), '_team_role', true ) ); ?></div>
+            <div class="team-card__name"><?php echo esc_html( $m['name'] ); ?></div>
+            <div class="team-card__role"><?php echo esc_html( $m['role'] ); ?></div>
           </div>
-        <?php endwhile; wp_reset_postdata(); ?>
+        <?php endforeach; ?>
+      </div>
+      <script>window.dbTeamMembers=<?php echo wp_json_encode( array_column( $team_members, null, 'id' ) ); ?>;</script>
+
+      <div class="team-modal" id="teamModal" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="team-modal__backdrop" id="teamModalBackdrop"></div>
+        <div class="team-modal__box">
+          <button class="team-modal__close" id="teamModalClose" aria-label="<?php esc_attr_e( 'Закрыть', 'deti-baikala' ); ?>">&times;</button>
+          <div class="team-modal__photo" id="teamModalPhoto"></div>
+          <div class="team-modal__name" id="teamModalName"></div>
+          <div class="team-modal__role" id="teamModalRole"></div>
+          <div class="team-modal__desc" id="teamModalDesc"></div>
+        </div>
       </div>
     <?php endif; ?>
 
