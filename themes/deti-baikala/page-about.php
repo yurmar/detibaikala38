@@ -91,7 +91,7 @@ while ( have_posts() ) :
     ?>
       <div class="donate-form" id="donate">
         <h3><?php esc_html_e( 'Сделать пожертвование', 'deti-baikala' ); ?></h3>
-        <?php echo do_shortcode( '[leyka_donation_form campaign="' . $donate_campaign_id . '"]' ); ?>
+        <?php echo do_shortcode( '[leyka_donation_form id="' . $donate_campaign_id . '"]' ); ?>
       </div>
     <?php endif; ?>
   </main>
