@@ -250,10 +250,11 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 .team-card__role{font-size:0.75rem;color:var(--text-muted)}
 .team-link{cursor:pointer;border-bottom:1px dashed var(--accent);color:inherit;text-decoration:none}
 .team-link:hover{border-bottom-style:solid;color:var(--accent)}
-.team-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1.5rem 1rem;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
+.team-modal{position:fixed;inset:0;z-index:9999;overflow-y:auto;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
 .team-modal.is-open{visibility:visible;opacity:1}
-.team-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
-.team-modal__box{position:relative;background:var(--bg-card);border-radius:16px;border:1px solid var(--border);padding:2rem;max-width:600px;width:100%;margin:auto;text-align:center;z-index:1;transform:translateY(20px);transition:transform .2s}
+.team-modal__backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.team-modal__wrap{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:100%;padding:1.5rem 1rem}
+.team-modal__box{background:var(--bg-card);border-radius:16px;border:1px solid var(--border);padding:2rem;max-width:600px;width:100%;text-align:center;transform:translateY(20px);transition:transform .2s}
 .team-modal.is-open .team-modal__box{transform:translateY(0)}
 .team-modal__close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;line-height:1;padding:.25rem;cursor:pointer;color:var(--text-muted)}
 .team-modal__close:hover{color:var(--text-primary)}

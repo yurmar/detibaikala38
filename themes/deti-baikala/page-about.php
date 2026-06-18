@@ -63,12 +63,14 @@ while ( have_posts() ) :
 
       <div class="team-modal" id="teamModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="team-modal__backdrop" id="teamModalBackdrop"></div>
-        <div class="team-modal__box">
-          <button class="team-modal__close" id="teamModalClose" aria-label="<?php esc_attr_e( 'Закрыть', 'deti-baikala' ); ?>">&times;</button>
-          <div class="team-modal__photo" id="teamModalPhoto"></div>
-          <div class="team-modal__name" id="teamModalName"></div>
-          <div class="team-modal__role" id="teamModalRole"></div>
-          <div class="team-modal__desc" id="teamModalDesc"></div>
+        <div class="team-modal__wrap">
+          <div class="team-modal__box">
+            <button class="team-modal__close" id="teamModalClose" aria-label="<?php esc_attr_e( 'Закрыть', 'deti-baikala' ); ?>">&times;</button>
+            <div class="team-modal__photo" id="teamModalPhoto"></div>
+            <div class="team-modal__name" id="teamModalName"></div>
+            <div class="team-modal__role" id="teamModalRole"></div>
+            <div class="team-modal__desc" id="teamModalDesc"></div>
+          </div>
         </div>
       </div>
     <?php endif; ?>
