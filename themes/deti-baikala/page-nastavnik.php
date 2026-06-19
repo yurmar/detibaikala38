@@ -46,6 +46,7 @@ if ( $intro_img || $intro_text ) :
 <?php
 $b1_bg    = $ns_img( '_ns_banner1_bg' );
 $b1_title = $ns( '_ns_banner1_title' );
+$b1_text  = $ns( '_ns_banner1_text' );
 $b1_btn   = $ns( '_ns_banner1_btn_text' );
 $b1_url   = $ns( '_ns_banner1_btn_url' );
 if ( $b1_title ) :
@@ -58,6 +59,9 @@ if ( $b1_title ) :
   </div>
   <div class="ns-banner__content reveal">
     <p class="ns-banner__title"><?php echo nl2br( esc_html( $b1_title ) ); ?></p>
+    <?php if ( $b1_text ) : ?>
+    <p class="ns-banner__text"><?php echo nl2br( esc_html( $b1_text ) ); ?></p>
+    <?php endif; ?>
     <?php if ( $b1_btn ) : ?>
     <a href="<?php echo esc_url( $b1_url ?: '#' ); ?>" class="btn btn-primary"><?php echo esc_html( $b1_btn ); ?></a>
     <?php endif; ?>

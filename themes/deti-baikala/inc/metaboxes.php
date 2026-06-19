@@ -426,6 +426,11 @@ db_register_page_template_metabox(
 			'type'  => 'textarea',
 		),
 		array(
+			'key'   => '_ns_banner1_text',
+			'label' => __( 'Баннер 1: текст (под заголовком)', 'deti-baikala' ),
+			'type'  => 'textarea',
+		),
+		array(
 			'key'   => '_ns_banner1_btn_text',
 			'label' => __( 'Баннер 1: текст кнопки', 'deti-baikala' ),
 			'type'  => 'text',
