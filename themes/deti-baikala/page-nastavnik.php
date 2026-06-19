@@ -78,11 +78,12 @@ $feat_url   = $ns( '_ns_features_btn_url' );
 
 $features = array();
 for ( $i = 1; $i <= 4; $i++ ) {
-	$icon  = $ns( "_ns_feat{$i}_icon" );
-	$title = $ns( "_ns_feat{$i}_title" );
-	$text  = $ns( "_ns_feat{$i}_text" );
-	if ( $icon || $title || $text ) {
-		$features[] = compact( 'icon', 'title', 'text' );
+	$icon_id  = get_post_meta( $pid, "_ns_feat{$i}_icon", true );
+	$icon_url = $icon_id ? wp_get_attachment_url( absint( $icon_id ) ) : '';
+	$title    = $ns( "_ns_feat{$i}_title" );
+	$text     = $ns( "_ns_feat{$i}_text" );
+	if ( $icon_url || $title || $text ) {
+		$features[] = array( 'icon_url' => $icon_url, 'title' => $title, 'text' => $text );
 	}
 }
 
@@ -103,8 +104,10 @@ if ( $feat_title || $features ) :
     <div class="ns-features__grid">
       <?php foreach ( $features as $idx => $feat ) : ?>
       <div class="ns-feature-card reveal reveal-delay-<?php echo esc_attr( $idx + 1 ); ?>">
-        <?php if ( $feat['icon'] ) : ?>
-        <div class="ns-feature-card__icon"><?php echo esc_html( $feat['icon'] ); ?></div>
+        <?php if ( $feat['icon_url'] ) : ?>
+        <div class="ns-feature-card__icon">
+          <img src="<?php echo esc_url( $feat['icon_url'] ); ?>" alt="">
+        </div>
         <?php endif; ?>
         <?php if ( $feat['title'] ) : ?>
         <div class="ns-feature-card__title"><?php echo nl2br( esc_html( $feat['title'] ) ); ?></div>

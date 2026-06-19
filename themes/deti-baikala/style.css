@@ -457,7 +457,8 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 .ns-features__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
 .ns-feature-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 2rem 1.25rem; text-align: center; transition: all var(--transition); }
 .ns-feature-card:hover { border-color: var(--border); transform: translateY(-3px); box-shadow: var(--shadow); }
-.ns-feature-card__icon { font-size: 2.5rem; margin-bottom: 1rem; line-height: 1; }
+.ns-feature-card__icon { margin-bottom: 1rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.ns-feature-card__icon img { width: 64px; height: 64px; object-fit: contain; display: block; }
 .ns-feature-card__title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; color: var(--text-primary); line-height: 1.3; }
 .ns-feature-card__text { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.65; }
 
