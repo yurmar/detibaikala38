@@ -141,26 +141,24 @@ if ( $banner_show ) :
     $banner_btn_url  = get_theme_mod( 'db_banner_btn_url', '' );
 ?>
 <!-- ===== BANNER ===== -->
-<div class="ns-banner reveal">
-  <div class="ns-banner__bg">
-    <?php if ( $banner_image ) : ?>
-      <img src="<?php echo esc_url( $banner_image ); ?>" alt="" aria-hidden="true">
-    <?php endif; ?>
-  </div>
-  <div class="ns-banner__content">
+<section class="section db-banner">
+  <div class="container">
     <?php if ( $banner_title ) : ?>
-      <h2 class="ns-banner__title"><?php echo esc_html( $banner_title ); ?></h2>
+      <h2 class="db-banner__title reveal"><?php echo esc_html( $banner_title ); ?></h2>
+    <?php endif; ?>
+    <?php if ( $banner_image ) : ?>
+      <img class="db-banner__img reveal" src="<?php echo esc_url( $banner_image ); ?>" alt="<?php echo esc_attr( $banner_title ); ?>">
     <?php endif; ?>
     <?php if ( $banner_text ) : ?>
-      <p class="ns-banner__text"><?php echo nl2br( esc_html( $banner_text ) ); ?></p>
+      <p class="db-banner__text reveal"><?php echo nl2br( esc_html( $banner_text ) ); ?></p>
     <?php endif; ?>
     <?php if ( $banner_btn_text ) : ?>
-      <a href="<?php echo esc_url( $banner_btn_url ? $banner_btn_url : '#' ); ?>" class="btn btn-primary">
+      <a href="<?php echo esc_url( $banner_btn_url ? $banner_btn_url : '#' ); ?>" class="btn btn-primary reveal">
         <?php echo esc_html( $banner_btn_text ); ?>
       </a>
     <?php endif; ?>
   </div>
-</div>
+</section>
 <?php endif; ?>
 
 <?php

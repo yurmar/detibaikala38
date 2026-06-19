@@ -457,6 +457,12 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 .ns-banner__quote { font-size: clamp(1rem, 2vw, 1.2rem); color: #C8D6E8; line-height: 1.75; font-style: italic; border: none; padding: 0; margin: 0; background: none; }
 .ns-banner__quote::before, .ns-banner__quote::after { content: none; }
 
+/* Баннер на главной (контентная ширина, без оверлея) */
+.db-banner__title { font-family: 'Montserrat', sans-serif; font-size: clamp(1.2rem, 2.5vw, 1.75rem); font-weight: 800; color: var(--text-primary); line-height: 1.3; margin-bottom: 1.25rem; }
+.db-banner__img { display: block; width: 100%; height: auto; border-radius: var(--radius); }
+.db-banner__text { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; max-width: 680px; margin-top: 1.25rem; }
+.db-banner .btn { margin-top: 1rem; }
+
 /* Сетка карточек-особенностей */
 .ns-features__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
 .ns-feature-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 2rem 1.25rem; text-align: center; transition: all var(--transition); }
