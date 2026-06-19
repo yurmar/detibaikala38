@@ -42,7 +42,7 @@ while ( have_posts() ) :
               <?php if ( has_post_thumbnail() ) : ?>
                 <?php the_post_thumbnail( 'medium_large' ); ?>
               <?php else : ?>
-                <span><?php esc_html_e( 'Фото проекта', 'deti-baikala' ); ?></span>
+                <img src="/wp-content/uploads/2026/06/db38_placeholder_news.jpg" alt="">
               <?php endif; ?>
             </div>
             <div class="project-card__body">

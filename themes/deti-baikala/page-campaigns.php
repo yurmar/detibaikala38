@@ -22,9 +22,47 @@ while ( have_posts() ) :
     <?php endif; ?>
 
     <?php if ( db_leyka_active() ) : ?>
-      <div class="campaigns-grid">
-        <?php echo do_shortcode( '[leyka_campaigns]' ); ?>
+      <?php
+      $campaigns_q = new WP_Query( array(
+          'post_type'      => 'leyka_campaign',
+          'posts_per_page' => -1,
+          'post_status'    => 'publish',
+          'orderby'        => 'date',
+          'order'          => 'DESC',
+      ) );
+      if ( $campaigns_q->have_posts() ) : ?>
+      <div class="projects-grid campaigns-grid">
+        <?php while ( $campaigns_q->have_posts() ) : $campaigns_q->the_post();
+            $progress = db_campaign_progress( get_the_ID() );
+            ?>
+          <div class="project-card campaign-card">
+            <div class="project-card__img">
+              <?php if ( has_post_thumbnail() ) : ?>
+                <?php the_post_thumbnail( 'medium_large' ); ?>
+              <?php else : ?>
+                <img src="/wp-content/uploads/2026/06/db38_placeholder_news.jpg" alt="">
+              <?php endif; ?>
+            </div>
+            <div class="project-card__body">
+              <div class="project-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></div>
+              <div class="project-card__text"><?php echo esc_html( db_excerpt( get_the_excerpt(), 160 ) ); ?></div>
+              <?php if ( $progress['target'] > 0 ) : ?>
+                <div class="progress-bar" style="margin:0.75rem 0">
+                  <div class="progress-bar__fill" style="width:<?php echo esc_attr( $progress['percent'] ); ?>%"></div>
+                </div>
+                <div class="sidebar-campaign__meta" style="margin-bottom:0.75rem">
+                  <span><?php echo esc_html( $progress['collected_text'] ); ?></span>
+                  <span><?php echo esc_html( $progress['percent'] ); ?>%</span>
+                </div>
+              <?php endif; ?>
+              <div class="project-card__footer">
+                <a href="<?php the_permalink(); ?>" class="btn btn-outline btn-sm"><?php esc_html_e( 'Подробнее', 'deti-baikala' ); ?></a>
+              </div>
+            </div>
+          </div>
+        <?php endwhile; wp_reset_postdata(); ?>
       </div>
+      <?php endif; ?>
 
       <div class="donate-form" id="donate-form" style="margin-top:3rem">
         <h3><?php esc_html_e( 'Сделать пожертвование', 'deti-baikala' ); ?></h3>

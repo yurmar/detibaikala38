@@ -12,7 +12,7 @@ $delay_class = isset( $args['delay_class'] ) ? $args['delay_class'] : '';
     <?php if ( has_post_thumbnail() ) : ?>
       <?php the_post_thumbnail( 'medium_large' ); ?>
     <?php else : ?>
-      <span><?php esc_html_e( 'Фото новости', 'deti-baikala' ); ?></span>
+      <img src="/wp-content/uploads/2026/06/db38_placeholder_news.jpg" alt="">
     <?php endif; ?>
   </div>
   <div class="news-card__body">

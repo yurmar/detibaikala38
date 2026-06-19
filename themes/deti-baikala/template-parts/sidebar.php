@@ -29,7 +29,11 @@
             ?>
             <div class="sidebar-news-item">
               <div class="sidebar-news-item__img">
-                <?php if ( has_post_thumbnail() ) the_post_thumbnail( 'thumbnail' ); ?>
+                <?php if ( has_post_thumbnail() ) : ?>
+                  <?php the_post_thumbnail( 'thumbnail' ); ?>
+                <?php else : ?>
+                  <img src="/wp-content/uploads/2026/06/db38_placeholder_news.jpg" alt="">
+                <?php endif; ?>
               </div>
               <div class="sidebar-news-item__text">
                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
