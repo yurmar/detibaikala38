@@ -42,6 +42,20 @@ if ( $intro_img || $intro_text ) :
 </section>
 <?php endif; ?>
 
+<!-- ===== ОСНОВНОЙ КОНТЕНТ СТРАНИЦЫ ===== -->
+<?php
+$page_content = apply_filters( 'the_content', get_the_content() );
+if ( $page_content ) :
+?>
+<section class="section ns-page-content">
+  <div class="container">
+    <div class="ns-page-content__body reveal">
+      <?php echo $page_content; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
 <!-- ===== БАННЕР 1 ===== -->
 <?php
 $b1_bg    = $ns_img( '_ns_banner1_bg' );
