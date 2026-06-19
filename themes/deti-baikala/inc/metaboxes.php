@@ -328,3 +328,201 @@ db_register_metabox(
 		),
 	)
 );
+
+/* ------------------------------------------------------------------ */
+/* Метабоксы для страниц с определёнными шаблонами                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Регистрирует метабокс только для страниц с нужным шаблоном.
+ */
+function db_register_page_template_metabox( $template_file, $box_id, $box_title, $fields ) {
+	// Показываем метабокс только на нужном шаблоне.
+	add_action(
+		'add_meta_boxes',
+		function ( $post_type, $post ) use ( $template_file, $box_id, $box_title, $fields ) {
+			if ( 'page' !== $post_type ) {
+				return;
+			}
+			if ( get_post_meta( $post->ID, '_wp_page_template', true ) !== $template_file ) {
+				return;
+			}
+			add_meta_box(
+				$box_id,
+				$box_title,
+				function ( $post ) use ( $fields, $box_id ) {
+					wp_nonce_field( 'db_save_' . $box_id, 'db_' . $box_id . '_nonce' );
+					echo '<table class="form-table">';
+					foreach ( $fields as $field ) {
+						db_render_metabox_field( $post, $field );
+					}
+					echo '</table>';
+				},
+				'page',
+				'normal',
+				'default'
+			);
+		},
+		10,
+		2
+	);
+
+	// Сохраняем только если шаблон совпадает.
+	add_action(
+		'save_post_page',
+		function ( $post_id ) use ( $template_file, $box_id, $fields ) {
+			if ( ! isset( $_POST[ 'db_' . $box_id . '_nonce' ] ) ) {
+				return;
+			}
+			if ( ! wp_verify_nonce( $_POST[ 'db_' . $box_id . '_nonce' ], 'db_save_' . $box_id ) ) {
+				return;
+			}
+			if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+				return;
+			}
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				return;
+			}
+			if ( get_post_meta( $post_id, '_wp_page_template', true ) !== $template_file ) {
+				return;
+			}
+			foreach ( $fields as $field ) {
+				db_save_metabox_field( $post_id, $field );
+			}
+		}
+	);
+}
+
+// Страница «Наставник»
+db_register_page_template_metabox(
+	'page-nastavnik.php',
+	'db_nastavnik_fields',
+	__( 'Содержимое страницы «Наставник»', 'deti-baikala' ),
+	array(
+
+		// --- Вступление ---
+		array(
+			'key'         => '_ns_intro_img',
+			'label'       => __( 'Вступление: изображение', 'deti-baikala' ),
+			'type'        => 'media',
+			'description' => __( 'Картинка слева (широкий баннер, горизонтальное фото).', 'deti-baikala' ),
+		),
+		array(
+			'key'   => '_ns_intro_text',
+			'label' => __( 'Вступление: текст', 'deti-baikala' ),
+			'type'  => 'textarea',
+		),
+
+		// --- Баннер 1 ---
+		array(
+			'key'         => '_ns_banner1_bg',
+			'label'       => __( 'Баннер 1: фоновое изображение', 'deti-baikala' ),
+			'type'        => 'media',
+			'description' => __( 'Затемняется автоматически.', 'deti-baikala' ),
+		),
+		array(
+			'key'   => '_ns_banner1_title',
+			'label' => __( 'Баннер 1: заголовок', 'deti-baikala' ),
+			'type'  => 'textarea',
+		),
+		array(
+			'key'   => '_ns_banner1_btn_text',
+			'label' => __( 'Баннер 1: текст кнопки', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+		array(
+			'key'   => '_ns_banner1_btn_url',
+			'label' => __( 'Баннер 1: ссылка кнопки', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+
+		// --- Особенности проекта ---
+		array(
+			'key'         => '_ns_features_label',
+			'label'       => __( 'Особенности: метка (маленькая)', 'deti-baikala' ),
+			'type'        => 'text',
+			'description' => __( 'Например: «Что такое проект».', 'deti-baikala' ),
+		),
+		array(
+			'key'   => '_ns_features_title',
+			'label' => __( 'Особенности: заголовок раздела', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+		array( 'key' => '_ns_feat1_icon',  'label' => __( 'Особенность 1: иконка (эмодзи)', 'deti-baikala' ), 'type' => 'emoji' ),
+		array( 'key' => '_ns_feat1_title', 'label' => __( 'Особенность 1: заголовок', 'deti-baikala' ),       'type' => 'text' ),
+		array( 'key' => '_ns_feat1_text',  'label' => __( 'Особенность 1: текст', 'deti-baikala' ),            'type' => 'textarea' ),
+		array( 'key' => '_ns_feat2_icon',  'label' => __( 'Особенность 2: иконка (эмодзи)', 'deti-baikala' ), 'type' => 'emoji' ),
+		array( 'key' => '_ns_feat2_title', 'label' => __( 'Особенность 2: заголовок', 'deti-baikala' ),       'type' => 'text' ),
+		array( 'key' => '_ns_feat2_text',  'label' => __( 'Особенность 2: текст', 'deti-baikala' ),            'type' => 'textarea' ),
+		array( 'key' => '_ns_feat3_icon',  'label' => __( 'Особенность 3: иконка (эмодзи)', 'deti-baikala' ), 'type' => 'emoji' ),
+		array( 'key' => '_ns_feat3_title', 'label' => __( 'Особенность 3: заголовок', 'deti-baikala' ),       'type' => 'text' ),
+		array( 'key' => '_ns_feat3_text',  'label' => __( 'Особенность 3: текст', 'deti-baikala' ),            'type' => 'textarea' ),
+		array( 'key' => '_ns_feat4_icon',  'label' => __( 'Особенность 4: иконка (эмодзи)', 'deti-baikala' ), 'type' => 'emoji' ),
+		array( 'key' => '_ns_feat4_title', 'label' => __( 'Особенность 4: заголовок', 'deti-baikala' ),       'type' => 'text' ),
+		array( 'key' => '_ns_feat4_text',  'label' => __( 'Особенность 4: текст', 'deti-baikala' ),            'type' => 'textarea' ),
+		array(
+			'key'   => '_ns_features_btn_text',
+			'label' => __( 'Особенности: текст кнопки', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+		array(
+			'key'   => '_ns_features_btn_url',
+			'label' => __( 'Особенности: ссылка кнопки', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+
+		// --- Баннер 2 (результаты) ---
+		array(
+			'key'         => '_ns_results_bg',
+			'label'       => __( 'Баннер 2: фоновое изображение', 'deti-baikala' ),
+			'type'        => 'media',
+			'description' => __( 'Затемняется автоматически.', 'deti-baikala' ),
+		),
+		array(
+			'key'         => '_ns_results_text',
+			'label'       => __( 'Баннер 2: текст (цитата / результат)', 'deti-baikala' ),
+			'type'        => 'textarea',
+		),
+
+		// --- Как это работает ---
+		array(
+			'key'         => '_ns_steps_label',
+			'label'       => __( 'Шаги: метка (маленькая)', 'deti-baikala' ),
+			'type'        => 'text',
+			'description' => __( 'Например: «Как это работает».', 'deti-baikala' ),
+		),
+		array(
+			'key'   => '_ns_steps_title',
+			'label' => __( 'Шаги: заголовок раздела', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+		array( 'key' => '_ns_step1', 'label' => __( 'Шаг 1', 'deti-baikala' ), 'type' => 'textarea' ),
+		array( 'key' => '_ns_step2', 'label' => __( 'Шаг 2', 'deti-baikala' ), 'type' => 'textarea' ),
+		array( 'key' => '_ns_step3', 'label' => __( 'Шаг 3', 'deti-baikala' ), 'type' => 'textarea' ),
+		array( 'key' => '_ns_step4', 'label' => __( 'Шаг 4', 'deti-baikala' ), 'type' => 'textarea' ),
+		array( 'key' => '_ns_step5', 'label' => __( 'Шаг 5', 'deti-baikala' ), 'type' => 'textarea' ),
+		array(
+			'key'   => '_ns_steps_btn_text',
+			'label' => __( 'Шаги: текст кнопки', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+		array(
+			'key'   => '_ns_steps_btn_url',
+			'label' => __( 'Шаги: ссылка кнопки', 'deti-baikala' ),
+			'type'  => 'text',
+		),
+
+		// --- Финальный баннер ---
+		array(
+			'key'         => '_ns_final_bg',
+			'label'       => __( 'Финальный баннер: фоновое изображение', 'deti-baikala' ),
+			'type'        => 'media',
+			'description' => __( 'Затемняется автоматически.', 'deti-baikala' ),
+		),
+		array(
+			'key'   => '_ns_final_text',
+			'label' => __( 'Финальный баннер: текст', 'deti-baikala' ),
+			'type'  => 'textarea',
+		),
+	)
+);
