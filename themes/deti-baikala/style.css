@@ -437,10 +437,10 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 
 /* Intro: изображение + текст */
 .ns-intro { padding: 5.5rem 0 2rem; }
-.ns-intro__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
-.ns-intro__img { border-radius: var(--radius); overflow: hidden; }
+.ns-intro__grid { display: grid; grid-template-columns: 2fr 3fr; gap: 3rem; align-items: start; }
+.ns-intro__img { border-radius: var(--radius); overflow: hidden; max-width: 100%; }
 .ns-intro__img img { width: 100%; height: auto; display: block; }
-.ns-intro__text { font-size: 1rem; color: var(--text-secondary); line-height: 1.85; }
+.ns-intro__text { font-size: 1rem; color: var(--text-secondary); line-height: 1.85; padding-top: 0.5rem; }
 
 /* Баннер-секция (полноширинный тёмный блок с фоном) */
 .ns-banner { position: relative; min-height: 400px; display: flex; align-items: center; justify-content: center; overflow: hidden; text-align: center; }
