@@ -162,6 +162,7 @@ require DB_THEME_DIR . '/inc/metaboxes.php';
 require DB_THEME_DIR . '/inc/customizer.php';
 require DB_THEME_DIR . '/inc/widgets.php';
 require DB_THEME_DIR . '/inc/contact-form.php';
+require DB_THEME_DIR . '/inc/nastavnik-form.php';
 require DB_THEME_DIR . '/inc/template-tags.php';
 require DB_THEME_DIR . '/inc/leyka-helpers.php';
 

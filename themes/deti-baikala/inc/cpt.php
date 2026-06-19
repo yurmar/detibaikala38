@@ -118,6 +118,33 @@ function db_register_post_types() {
 		)
 	);
 
+	// Анкеты кандидатов — Наставник
+	register_post_type(
+		'nastavnik_candidate',
+		array(
+			'labels' => array(
+				'name'          => 'Анкеты кандидатов',
+				'singular_name' => 'Анкета кандидата',
+				'add_new_item'  => 'Добавить анкету',
+				'edit_item'     => 'Просмотр анкеты',
+				'all_items'     => 'Все анкеты',
+				'menu_name'     => 'Анкеты — Наставник',
+			),
+			'public'             => false,
+			'publicly_queryable' => false,
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'has_archive'        => false,
+			'menu_icon'          => 'dashicons-id',
+			'supports'           => array( 'title' ),
+			'capability_type'    => 'post',
+			'capabilities'       => array(
+				'create_posts' => 'do_not_allow',
+			),
+			'map_meta_cap'       => true,
+		)
+	);
+
 	// Партнёры
 	register_post_type(
 		'partner',
