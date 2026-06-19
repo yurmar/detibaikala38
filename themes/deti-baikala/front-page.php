@@ -132,6 +132,38 @@ if ( $rutube_url ) :
 <?php endif; endif; ?>
 
 <?php
+$banner_show = get_theme_mod( 'db_banner_show', false );
+if ( $banner_show ) :
+    $banner_image    = get_theme_mod( 'db_banner_image', '' );
+    $banner_title    = get_theme_mod( 'db_banner_title', '' );
+    $banner_text     = get_theme_mod( 'db_banner_text', '' );
+    $banner_btn_text = get_theme_mod( 'db_banner_btn_text', '' );
+    $banner_btn_url  = get_theme_mod( 'db_banner_btn_url', '' );
+?>
+<!-- ===== BANNER ===== -->
+<div class="ns-banner reveal">
+  <div class="ns-banner__bg">
+    <?php if ( $banner_image ) : ?>
+      <img src="<?php echo esc_url( $banner_image ); ?>" alt="" aria-hidden="true">
+    <?php endif; ?>
+  </div>
+  <div class="ns-banner__content">
+    <?php if ( $banner_title ) : ?>
+      <h2 class="ns-banner__title"><?php echo esc_html( $banner_title ); ?></h2>
+    <?php endif; ?>
+    <?php if ( $banner_text ) : ?>
+      <p class="ns-banner__text"><?php echo nl2br( esc_html( $banner_text ) ); ?></p>
+    <?php endif; ?>
+    <?php if ( $banner_btn_text ) : ?>
+      <a href="<?php echo esc_url( $banner_btn_url ? $banner_btn_url : '#' ); ?>" class="btn btn-primary">
+        <?php echo esc_html( $banner_btn_text ); ?>
+      </a>
+    <?php endif; ?>
+  </div>
+</div>
+<?php endif; ?>
+
+<?php
 $news_query = new WP_Query(
     array(
         'post_type'      => 'post',

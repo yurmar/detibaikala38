@@ -65,6 +65,22 @@ function db_customize_register( $wp_customize ) {
 		db_add_setting( $wp_customize, "db_stat_{$i}_label", sprintf( __( 'Карточка %d — подпись (новая строка = <br>)', 'deti-baikala' ), $i ), 'textarea', 'db_stats', $stats_defaults[ $i ]['label'] );
 	}
 
+	/* ---------------------------- BANNER ---------------------------- */
+	$wp_customize->add_section(
+		'db_banner',
+		array(
+			'title' => __( 'Баннер на главной (после «Пожертвовать»)', 'deti-baikala' ),
+			'panel' => 'db_theme_options',
+		)
+	);
+
+	db_add_setting( $wp_customize, 'db_banner_show', __( 'Показывать баннер', 'deti-baikala' ), 'checkbox', 'db_banner', false );
+	db_add_setting( $wp_customize, 'db_banner_image', __( 'Фоновое изображение', 'deti-baikala' ), 'image', 'db_banner', '' );
+	db_add_setting( $wp_customize, 'db_banner_title', __( 'Заголовок', 'deti-baikala' ), 'text', 'db_banner', '' );
+	db_add_setting( $wp_customize, 'db_banner_text', __( 'Текст / описание', 'deti-baikala' ), 'textarea', 'db_banner', '' );
+	db_add_setting( $wp_customize, 'db_banner_btn_text', __( 'Кнопка — текст', 'deti-baikala' ), 'text', 'db_banner', '' );
+	db_add_setting( $wp_customize, 'db_banner_btn_url', __( 'Кнопка — ссылка', 'deti-baikala' ), 'url', 'db_banner', '' );
+
 	/* ---------------------------- CONTACTS ---------------------------- */
 	$wp_customize->add_section(
 		'db_contacts',
