@@ -5,7 +5,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'DB_THEME_VERSION', '1.0.5' );
+define( 'DB_THEME_VERSION', '1.0.6' );
 define( 'DB_THEME_DIR', get_template_directory() );
 define( 'DB_THEME_URI', get_template_directory_uri() );
 
