@@ -30,10 +30,10 @@ $sent = isset( $_GET['nastavnik_sent'] ) ? sanitize_key( $_GET['nastavnik_sent']
 .rline{display:flex;flex-direction:column;gap:.3rem;width:100%}
 .rline label{font-size:.82rem;font-weight:500;color:var(--text-secondary);line-height:1.4}
 .red{color:#e55}
-.rfield{width:100%;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary);font-family:inherit;font-size:.9rem;transition:border-color var(--transition),box-shadow var(--transition)}
-.rfield:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-textarea.rfield{min-height:90px;resize:vertical}
-select.rfield{cursor:pointer}
+.rfield,.nc-input{width:100%;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-primary);color:var(--text-primary);font-family:inherit;font-size:.9rem;transition:border-color var(--transition),box-shadow var(--transition)}
+.rfield:focus,.nc-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+textarea.rfield,textarea.nc-input{min-height:90px;resize:vertical}
+select.rfield,select.nc-input{cursor:pointer}
 .rfield.rf_error{border-color:#e55!important;box-shadow:0 0 0 3px rgba(220,50,50,.12)!important}
 .rfield_error{font-size:.75rem;color:#e55;visibility:hidden;line-height:1.3}
 .citizenship-row{display:flex;align-items:center;gap:1.25rem;margin-top:.25rem;flex-wrap:wrap}
@@ -203,10 +203,10 @@ input[type=checkbox].rfield{flex-shrink:0;width:18px;height:18px;margin-top:.15r
       </div>
 
       <div class="fields one">
-        <div class="rline">
+        <p class="rline">
           <label>Имеете ли вы серьёзные заболевания? Если да, укажите, какие.</label>
-          <input type="text" name="your-disease">
-        </div>
+          <input type="text" class="nc-input" name="your-disease">
+        </p>
       </div>
     </div>
 
