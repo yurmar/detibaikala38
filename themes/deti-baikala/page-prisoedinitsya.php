@@ -60,11 +60,10 @@ select.rfield,select.nc-input{cursor:pointer}
 .nc-agreement ul li{font-size:.85rem;color:var(--text-secondary);margin-bottom:.35rem}
 .nc-agreement p{font-size:.85rem;color:var(--text-secondary);margin-bottom:.5rem}
 .nc-agreement em{font-size:.82rem;color:var(--text-muted)}
-.nc-check-row{display:flex;align-items:flex-start;gap:.75rem}
-.rline.check-rline{display:flex;align-items:flex-start}
-input[type=checkbox].rfield{flex-shrink:0;width:18px;height:18px;margin-top:.15rem;accent-color:var(--accent);cursor:pointer}
-.nc-check-row label{font-size:.87rem;line-height:1.55;color:var(--text-secondary);cursor:pointer}
-.nc-check-row label a{color:var(--accent);text-decoration:underline}
+input[type=checkbox].rfield{flex-shrink:0;width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+.rline.check-rline{flex-direction:row;align-items:center;gap:.5rem;margin-bottom:.6rem}
+.nc-check-label{font-size:.87rem;line-height:1.6;color:var(--text-secondary);cursor:pointer;display:block}
+.nc-check-label a{color:var(--accent);text-decoration:underline}
 /* Кнопка отправить */
 .nc-submit-row{text-align:center;margin-top:2rem}
 .btnsubmit{min-width:220px;padding:.75rem 2.5rem;font-size:1rem;cursor:pointer}
@@ -442,15 +441,13 @@ input[type=checkbox].rfield{flex-shrink:0;width:18px;height:18px;margin-top:.15r
 
       <div class="nc-agreement">
         <h4>Личное заявление</h4>
-        <div class="nc-check-row">
-          <p class="rline check-rline">
-            <input type="checkbox" class="rfield" name="agreement" id="agreement" value="1">
-          </p>
-          <label for="agreement">
-            Я понимаю цели Программы Наставник и обязуюсь следовать разработанным индивидуальным планам, предложенным мне координатором
-            (с учётом оценки потребностей детей-сирот), а также соблюдать конфиденциальность по любой личной информации о ребёнке, которая может стать мне известной.
-          </label>
-        </div>
+        <p class="rline check-rline">
+          <input type="checkbox" class="rfield" name="agreement" id="agreement" value="1">
+        </p>
+        <label for="agreement" class="nc-check-label">
+          Я понимаю цели Программы Наставник и обязуюсь следовать разработанным индивидуальным планам, предложенным мне координатором
+          (с учётом оценки потребностей детей-сирот), а также соблюдать конфиденциальность по любой личной информации о ребёнке, которая может стать мне известной.
+        </label>
         <ul>
           <li>я обязуюсь сообщать координатору Программы об изменениях в моём графике (при невозможности присутствовать на запланированных ранее мероприятиях) или состоянии моего здоровья.</li>
           <li>я обязуюсь не покидать территорию учреждения вместе с ребёнком, без ведома и разрешения дирекции и координатора.</li>
@@ -462,19 +459,17 @@ input[type=checkbox].rfield{flex-shrink:0;width:18px;height:18px;margin-top:.15r
 
       <div class="nc-agreement">
         <h4>Согласие на обработку персональных данных</h4>
-        <div class="nc-check-row">
-          <p class="rline check-rline">
-            <input type="checkbox" class="rfield" name="personal_data" id="personal_data" value="1">
-          </p>
-          <label for="personal_data">
-            Я даю согласие на обработку своих персональных данных, то есть совершение, в том числе, следующих действий:
-            обработку (включая сбор, систематизацию, накопление, хранение, уточнение (обновление, изменение),
-            использование, обезличивание, блокирование, уничтожение персональных данных), при этом общее описание
-            вышеуказанных способов обработки данных приведено в Федеральном законе от 27.07.2006 № 152-ФЗ,
-            а также на передачу такой информации третьим лицам, в случаях, установленных нормативными документами
-            вышестоящих органов и законодательством.
-          </label>
-        </div>
+        <p class="rline check-rline">
+          <input type="checkbox" class="rfield" name="personal_data" id="personal_data" value="1">
+        </p>
+        <label for="personal_data" class="nc-check-label">
+          Я даю согласие на обработку своих персональных данных, то есть совершение, в том числе, следующих действий:
+          обработку (включая сбор, систематизацию, накопление, хранение, уточнение (обновление, изменение),
+          использование, обезличивание, блокирование, уничтожение персональных данных), при этом общее описание
+          вышеуказанных способов обработки данных приведено в Федеральном законе от 27.07.2006 № 152-ФЗ,
+          а также на передачу такой информации третьим лицам, в случаях, установленных нормативными документами
+          вышестоящих органов и законодательством.
+        </label>
       </div>
 
     </div>
