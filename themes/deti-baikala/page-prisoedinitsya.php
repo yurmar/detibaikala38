@@ -56,7 +56,7 @@ select.rfield,select.nc-input{cursor:pointer}
 /* Согласия */
 .nc-agreement{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1rem}
 .nc-agreement h4{font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-primary);margin-bottom:.75rem;font-family:'Montserrat',sans-serif}
-.nc-agreement ul{padding-left:1.25rem;margin:.5rem 0 .75rem}
+.nc-agreement ul{list-style:disc;padding-left:1.25rem;margin:.5rem 0 .75rem}
 .nc-agreement ul li{font-size:.85rem;color:var(--text-secondary);margin-bottom:.35rem}
 .nc-agreement p{font-size:.85rem;color:var(--text-secondary);margin-bottom:.5rem}
 .nc-agreement em{font-size:.82rem;color:var(--text-muted)}
@@ -557,43 +557,53 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ===== ВАЛИДАЦИЯ ===== */
-(function($) {
-  $(function() {
-    var form = $('.form_check');
-    if (!form.length) return;
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.querySelector('.form_check');
+  if (!form) return;
 
-    var btn = form.find('.btnsubmit');
+  var btn = form.querySelector('.btnsubmit');
 
-    /* Добавляем тексты ошибок и помечаем поля пустыми */
-    form.find('.rfield').addClass('empty_field').parents('.rline').append('<span class="rfield_error">Заполните это поле</span>');
-    btn.addClass('disabled');
+  form.querySelectorAll('.rfield').forEach(function(el) {
+    el.classList.add('empty_field');
+    var rline = el.closest('.rline');
+    if (rline) {
+      var span = document.createElement('span');
+      span.className = 'rfield_error';
+      span.textContent = 'Заполните это поле';
+      rline.appendChild(span);
+    }
+  });
+  btn.classList.add('disabled');
 
-    function checkInput() {
-      form.find('.rfield').each(function() {
-        var $el = $(this);
-        if ($el.is(':checkbox')) {
-          $el.toggleClass('empty_field', !$el.is(':checked'));
-        } else {
-          $el.toggleClass('empty_field', $el.val() === '');
+  function checkInput() {
+    form.querySelectorAll('.rfield').forEach(function(el) {
+      if (el.type === 'checkbox') {
+        el.classList.toggle('empty_field', !el.checked);
+      } else {
+        el.classList.toggle('empty_field', el.value === '');
+      }
+    });
+  }
+
+  setInterval(function() {
+    checkInput();
+    btn.classList.toggle('disabled', form.querySelector('.empty_field') !== null);
+  }, 500);
+
+  btn.addEventListener('click', function(e) {
+    if (btn.classList.contains('disabled')) {
+      e.preventDefault();
+      form.querySelectorAll('.empty_field').forEach(function(el) {
+        el.classList.add('rf_error');
+        var rline = el.closest('.rline');
+        if (rline) {
+          var err = rline.querySelector('.rfield_error');
+          if (err) err.style.visibility = 'visible';
         }
       });
     }
-
-    setInterval(function() {
-      checkInput();
-      var hasEmpty = form.find('.empty_field').length > 0;
-      btn.toggleClass('disabled', hasEmpty);
-    }, 500);
-
-    btn.on('click', function(e) {
-      if ($(this).hasClass('disabled')) {
-        e.preventDefault();
-        form.find('.empty_field').addClass('rf_error');
-        form.find('.empty_field').parents('.rline').find('.rfield_error').css({ visibility: 'visible' });
-      }
-    });
   });
-})(jQuery);
+});
 </script>
 
 <?php get_footer(); ?>
