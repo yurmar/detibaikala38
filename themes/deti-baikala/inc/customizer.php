@@ -138,6 +138,7 @@ function db_customize_register( $wp_customize ) {
 	db_add_setting( $wp_customize, 'db_req_inn', __( 'ИНН', 'deti-baikala' ), 'text', 'db_requisites', '3811000001' );
 	db_add_setting( $wp_customize, 'db_req_kpp', __( 'КПП', 'deti-baikala' ), 'text', 'db_requisites', '381101001' );
 	db_add_setting( $wp_customize, 'db_req_ogrn', __( 'ОГРН', 'deti-baikala' ), 'text', 'db_requisites', '1123800000001' );
+	db_add_setting( $wp_customize, 'db_req_okved', __( 'ОКВЭД', 'deti-baikala' ), 'text', 'db_requisites', '' );
 	db_add_setting( $wp_customize, 'db_req_account', __( 'Расчётный счёт', 'deti-baikala' ), 'text', 'db_requisites', '40703810000000000000' );
 	db_add_setting( $wp_customize, 'db_req_bank', __( 'Банк', 'deti-baikala' ), 'text', 'db_requisites', 'ПАО Сбербанк, г. Иркутск' );
 	db_add_setting( $wp_customize, 'db_req_bik', __( 'БИК', 'deti-baikala' ), 'text', 'db_requisites', '042520607' );

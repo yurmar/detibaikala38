@@ -62,6 +62,7 @@ function db_render_requisites() {
 		'db_req_inn'         => __( 'ИНН', 'deti-baikala' ),
 		'db_req_kpp'         => __( 'КПП', 'deti-baikala' ),
 		'db_req_ogrn'        => __( 'ОГРН', 'deti-baikala' ),
+		'db_req_okved'       => __( 'ОКВЭД', 'deti-baikala' ),
 		'db_req_account'     => __( 'Р/с', 'deti-baikala' ),
 		'db_req_bank'        => __( 'Банк', 'deti-baikala' ),
 		'db_req_bik'         => __( 'БИК', 'deti-baikala' ),
