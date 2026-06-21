@@ -144,6 +144,26 @@ function db_customize_register( $wp_customize ) {
 	db_add_setting( $wp_customize, 'db_req_bik', __( 'БИК', 'deti-baikala' ), 'text', 'db_requisites', '042520607' );
 	db_add_setting( $wp_customize, 'db_req_corr_account', __( 'Корр. счёт', 'deti-baikala' ), 'text', 'db_requisites', '30101810900000000607' );
 
+	$wp_customize->add_setting(
+		'db_charter_pdf',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'absint',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Media_Control(
+			$wp_customize,
+			'db_charter_pdf',
+			array(
+				'label'     => __( 'Устав организации (PDF)', 'deti-baikala' ),
+				'section'   => 'db_requisites',
+				'mime_type' => 'application/pdf',
+			)
+		)
+	);
+
 	/* ---------------------------- PAYMENT BADGE ---------------------------- */
 	$wp_customize->add_section(
 		'db_payment',

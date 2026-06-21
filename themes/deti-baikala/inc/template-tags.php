@@ -93,6 +93,19 @@ function db_render_requisites() {
 				</div>
 			<?php endforeach; ?>
 		</div>
+	<?php
+	$charter_id = get_theme_mod( 'db_charter_pdf' );
+	if ( $charter_id ) {
+		$charter_url = wp_get_attachment_url( $charter_id );
+		if ( $charter_url ) {
+			?>
+			<a class="btn btn-secondary" href="<?php echo esc_url( $charter_url ); ?>" target="_blank" rel="noopener" style="margin-top:1.25rem;display:inline-flex">
+				<?php esc_html_e( 'Скачать Устав (PDF)', 'deti-baikala' ); ?>
+			</a>
+			<?php
+		}
+	}
+	?>
 	</div>
 	<?php
 }
