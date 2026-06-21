@@ -79,7 +79,7 @@ while ( have_posts() ) :
     </div>
 
     <!-- Contact form -->
-    <div class="donate-form" id="contact-form" style="margin-top:2rem">
+    <!-- <div class="donate-form" id="contact-form" style="margin-top:2rem">
       <h3><?php esc_html_e( 'Написать нам', 'deti-baikala' ); ?></h3>
 
       <?php if ( isset( $_GET['db_contact'] ) && 'success' === $_GET['db_contact'] ) : ?>
@@ -116,7 +116,7 @@ while ( have_posts() ) :
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center"><?php esc_html_e( 'Отправить сообщение', 'deti-baikala' ); ?></button>
       </form>
-    </div>
+    </div> -->
 
     <?php db_render_requisites(); ?>
   </main>
