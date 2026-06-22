@@ -117,7 +117,7 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 .hero__bg{position:absolute;inset:0;background:linear-gradient(135deg,#060F1C 0%,#0A1E38 50%,#05111F 100%);z-index:0}
 .hero__bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 60% 50%,rgba(0,196,204,0.08) 0%,transparent 70%)}
 .hero__bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.25;filter:saturate(0.5)}
-.hero__bg::after{content:'';position:absolute;inset:0;background:rgba(5,11,21,0.55);z-index:1}
+.hero__bg::after{content:'';position:absolute;inset:0;background:rgba(5,11,21,0.4);z-index:1}
 [data-theme="light"] .hero__bg{background:linear-gradient(135deg,#0A1E38 0%,#1A3A6A 100%)}
 [data-theme="light"] .hero__bg-img{opacity:0.3}
 .hero .container{width:100%}
