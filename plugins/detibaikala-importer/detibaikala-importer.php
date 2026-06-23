@@ -88,6 +88,28 @@ function dbi_admin_page() {
             </div>
         </div>
 
+        <!-- ── Шаг 3: обновить аудио/видео ── -->
+        <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
+            <h3 style="margin-top:0">Шаг 3 — Найти и обновить аудио/видео</h3>
+            <p style="color:#666;margin-top:0">
+                Перепарсит все импортированные URL и обновит контент постов, у которых
+                в источнике есть <code>&lt;audio&gt;</code> или <code>&lt;iframe&gt;</code>, но в WordPress они отсутствуют.
+            </p>
+            <?php if ( empty( $done ) ): ?>
+                <p style="color:#888;margin:0">Нет импортированных статей.</p>
+            <?php else: ?>
+                <button id="btn-reparse" class="button button-primary">Найти и обновить (<?= count( $done ) ?> статей)</button>
+                <button id="btn-reparse-stop" class="button" style="display:none;margin-left:8px">Остановить</button>
+                <div id="dbi-reparse-progress" style="margin-top:12px;display:none">
+                    <div style="background:#e0e0e0;height:20px;border-radius:4px;width:500px">
+                        <div id="dbi-reparse-bar" style="background:#0073aa;height:20px;border-radius:4px;width:0;transition:width 0.3s"></div>
+                    </div>
+                    <p id="dbi-reparse-status" style="margin-bottom:0"></p>
+                    <p id="dbi-reparse-counts" style="color:#888;margin:4px 0 0"></p>
+                </div>
+            <?php endif; ?>
+        </div>
+
         <!-- ── Диагностика ── -->
         <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
             <h3 style="margin-top:0">Диагностика — проверить URL</h3>
@@ -217,6 +239,81 @@ function dbi_admin_page() {
                 location.reload();
             });
         });
+
+        // ── Шаг 3: найти и обновить аудио/видео ──
+        const reparseAll    = <?= json_encode( array_values( $done ) ) ?>;
+        let reparseQueue    = [];
+        let reparseRunning  = false;
+        let reparseUpdated  = 0;
+        let reparseChecked  = 0;
+
+        $('#btn-reparse').on('click', function(){
+            reparseRunning = true;
+            reparseQueue   = reparseAll.slice();
+            reparseUpdated = 0;
+            reparseChecked = 0;
+            $(this).prop('disabled', true);
+            $('#btn-reparse-stop').show();
+            $('#dbi-reparse-progress').show();
+            reparseNext();
+        });
+
+        $('#btn-reparse-stop').on('click', function(){
+            reparseRunning = false;
+            $(this).hide();
+            $('#btn-reparse').prop('disabled', false);
+            $('#dbi-reparse-status').css('color','#666').text('Остановлено.');
+        });
+
+        function reparseNext() {
+            if (!reparseRunning || reparseQueue.length === 0) {
+                if (reparseQueue.length === 0 && reparseRunning) {
+                    reparseRunning = false;
+                    $('#btn-reparse').prop('disabled', false);
+                    $('#btn-reparse-stop').hide();
+                    $('#dbi-reparse-status').css('color','#2a7a2a')
+                        .text('✓ Готово. Обновлено: ' + reparseUpdated + ' из ' + reparseChecked + ' проверенных.');
+                    $('#dbi-reparse-bar').css('width', '100%');
+                }
+                return;
+            }
+            const url     = reparseQueue.shift();
+            reparseChecked++;
+            const total   = reparseAll.length;
+            const checked = reparseChecked;
+            $('#dbi-reparse-bar').css('width', Math.round(checked / total * 100) + '%');
+            $('#dbi-reparse-status').css('color','#666').text('[' + checked + '/' + total + '] Проверяю...');
+
+            $.post(ajax, {action:'dbi_reparse_url', nonce, url}, function(r){
+                if (r.success) {
+                    const s = r.data.status;
+                    if (s === 'updated') {
+                        reparseUpdated++;
+                        $('#dbi-reparse-status').css('color','#2a7a2a')
+                            .text('[' + checked + '/' + total + '] ✓ Обновлено: ' + r.data.title);
+                    } else if (s === 'no_media') {
+                        $('#dbi-reparse-status').css('color','#666')
+                            .text('[' + checked + '/' + total + '] — Без медиа: ' + r.data.title);
+                    } else if (s === 'already_ok') {
+                        $('#dbi-reparse-status').css('color','#666')
+                            .text('[' + checked + '/' + total + '] — Уже есть: ' + r.data.title);
+                    } else {
+                        $('#dbi-reparse-status').css('color','#888')
+                            .text('[' + checked + '/' + total + '] — ' + s + ': ' + (r.data.title || url));
+                    }
+                    $('#dbi-reparse-counts').text('Обновлено: ' + reparseUpdated);
+                } else {
+                    $('#dbi-reparse-status').css('color','#c00')
+                        .text('[' + checked + '/' + total + '] ✗ Ошибка: ' + url);
+                }
+                setTimeout(reparseNext, 400);
+            }).fail(function(){
+                reparseQueue.unshift(url);
+                reparseChecked--;
+                $('#dbi-reparse-status').css('color','#c00').text('Ошибка сети, повтор через 5с...');
+                setTimeout(reparseNext, 5000);
+            });
+        }
 
         // ── Диагностика ──
         $('#btn-debug').on('click', function(){
@@ -449,6 +546,7 @@ add_action( 'wp_ajax_dbi_import_post', function () {
         }
     }
 
+    update_post_meta( $post_id, '_dbi_source_url', $url );
     $done[] = $url;
     update_option( DBI_OPTION_DONE, $done, false );
     dbi_log( 'OK: ' . $data['title'] . ' [post_id=' . $post_id . ']' );
@@ -469,6 +567,59 @@ add_action( 'wp_ajax_dbi_reset', function () {
     delete_option( DBI_OPTION_LOG );
 
     wp_send_json_success();
+} );
+
+// ──────────────────────────────────────────────
+// AJAX: Re-parse one URL and update post if audio/video found
+// ──────────────────────────────────────────────
+
+add_action( 'wp_ajax_dbi_reparse_url', function () {
+    check_ajax_referer( 'dbi_nonce', 'nonce' );
+    if ( ! current_user_can( 'manage_options' ) ) wp_die();
+
+    $url = esc_url_raw( $_POST['url'] ?? '' );
+    if ( ! $url ) wp_send_json_error( 'Пустой URL' );
+
+    $html = dbi_fetch( $url );
+    if ( is_wp_error( $html ) ) {
+        wp_send_json_error( $html->get_error_message() );
+    }
+
+    $data = dbi_parse_article( $html, $url );
+    if ( ! $data ) {
+        wp_send_json_success( [ 'status' => 'parse_fail', 'title' => $url ] );
+        return;
+    }
+
+    // Нет медиа — пропускаем
+    $has_audio  = strpos( $data['content'], '<audio' )  !== false;
+    $has_iframe = strpos( $data['content'], '<iframe' ) !== false;
+    if ( ! $has_audio && ! $has_iframe ) {
+        wp_send_json_success( [ 'status' => 'no_media', 'title' => $data['title'] ] );
+        return;
+    }
+
+    // Ищем WP-пост
+    $post_id = dbi_find_post( $url, $data['title'], $data['date'] );
+    if ( ! $post_id ) {
+        wp_send_json_success( [ 'status' => 'not_found', 'title' => $data['title'] ] );
+        return;
+    }
+
+    // Проверяем, нет ли уже медиа в посте
+    $existing = get_post_field( 'post_content', $post_id );
+    $post_has_audio  = strpos( $existing, '<audio' )  !== false;
+    $post_has_iframe = strpos( $existing, '<iframe' ) !== false;
+    if ( $post_has_audio || $post_has_iframe ) {
+        wp_send_json_success( [ 'status' => 'already_ok', 'title' => $data['title'] ] );
+        return;
+    }
+
+    wp_update_post( [ 'ID' => $post_id, 'post_content' => $data['content'] ] );
+    update_post_meta( $post_id, '_dbi_source_url', $url );
+    dbi_log( 'ОБНОВЛЕНО (аудио/видео): ' . $data['title'] . ' [post_id=' . $post_id . ']' );
+
+    wp_send_json_success( [ 'status' => 'updated', 'title' => $data['title'], 'post_id' => $post_id ] );
 } );
 
 // ──────────────────────────────────────────────
@@ -535,6 +686,39 @@ function dbi_extract_article_links( string $html ): array {
     }
 
     return array_values( array_unique( $links ) );
+}
+
+/**
+ * Найти WP-пост по meta _dbi_source_url или по заголовку + дате (fallback).
+ */
+function dbi_find_post( string $url, string $title, string $date ): ?int {
+    // Сначала по мета (для постов, импортированных с v2.1+)
+    $by_meta = get_posts( [
+        'post_type'      => 'post',
+        'post_status'    => [ 'publish', 'draft', 'private' ],
+        'meta_key'       => '_dbi_source_url',
+        'meta_value'     => $url,
+        'posts_per_page' => 1,
+        'no_found_rows'  => true,
+        'fields'         => 'ids',
+    ] );
+    if ( $by_meta ) return (int) $by_meta[0];
+
+    // Fallback: заголовок + дата
+    $date_str = substr( $date, 0, 10 );
+    $q = new WP_Query( [
+        'post_type'      => 'post',
+        'post_status'    => [ 'publish', 'draft', 'private' ],
+        'title'          => $title,
+        'date_query'     => [ [
+            'year'  => (int) substr( $date_str, 0, 4 ),
+            'month' => (int) substr( $date_str, 5, 2 ),
+            'day'   => (int) substr( $date_str, 8, 2 ),
+        ] ],
+        'posts_per_page' => 1,
+        'no_found_rows'  => true,
+    ] );
+    return $q->have_posts() ? (int) $q->posts[0]->ID : null;
 }
 
 /**
@@ -715,10 +899,11 @@ function dbi_parse_article( string $html, string $source_url ): ?array {
             if ( $a->parentNode ) $a->parentNode->removeChild( $a );
         }
 
-        // Включаем элементы с текстом, изображениями или iframe (встроенное видео)
-        $tag     = strtolower( $child->nodeName );
-        $has_img = $xpath->query( './/img', $child )->length > 0;
-        if ( trim( $child->textContent ) === '' && ! $has_img && $tag !== 'iframe' ) continue;
+        // Включаем элементы с текстом, изображениями, iframe или audio
+        $tag       = strtolower( $child->nodeName );
+        $has_img   = $xpath->query( './/img',   $child )->length > 0;
+        $has_audio = $xpath->query( './/audio', $child )->length > 0;
+        if ( trim( $child->textContent ) === '' && ! $has_img && ! $has_audio && $tag !== 'iframe' ) continue;
 
         $content .= dbi_node_to_html( $dom, $child );
     }
