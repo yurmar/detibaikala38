@@ -591,10 +591,12 @@ function dbi_fetch( string $url ): string|WP_Error {
 /**
  * Parse a single article page from detibaikala.com.
  *
- * Title:   .col-md-9 h2  →  h1.entry-title  →  h1  →  h2
- * Date:    div[style*='a9a9a9']  →  time[datetime]  →  .entry-date  →  .post-date
- * Image:   .img-thum img  →  og:image  →  .wp-post-image  →  first img in content
- * Content: p and blockquote (excluding figure descendants)
+ * Title:   .col-md-9 h2  →  h1.entry-title  →  h1
+ * Date:    div[style*='a9a9a9']  →  time[datetime]  →  .entry-date
+ * Image:   .img-thum img  →  og:image  →  .wp-post-image
+ * Content: all direct children of the container, skipping header elements,
+ *          scripts, and social widgets. Removes "Больше фотографий." links.
+ *          Falls back to <p>/<blockquote> scan if nothing found.
  */
 function dbi_parse_article( string $html, string $source_url ): ?array {
     $dom = new DOMDocument();
@@ -610,7 +612,6 @@ function dbi_parse_article( string $html, string $source_url ): ?array {
         }
     }
     if ( ! $container ) {
-        // Fallback: article или entry-content
         foreach ( $xpath->query( '//article | //*[contains(@class,"entry-content")] | //*[contains(@class,"post-content")]' ) as $node ) {
             if ( $xpath->query( './/h1 | .//h2', $node )->length > 0 ) {
                 $container = $node;
@@ -623,20 +624,22 @@ function dbi_parse_article( string $html, string $source_url ): ?array {
     }
 
     // Заголовок
-    $title = '';
-    $h2 = $xpath->query( './/h2', $container )->item( 0 );
-    if ( $h2 ) $title = trim( $h2->textContent );
+    $title   = '';
+    $h2_node = $xpath->query( './/h2', $container )->item( 0 );
+    if ( $h2_node ) $title = trim( $h2_node->textContent );
     if ( ! $title ) {
-        $h1 = $xpath->query( '//h1[contains(@class,"entry-title")] | //h1', $container )->item( 0 );
+        $h1 = $xpath->query( '//h1[contains(@class,"entry-title")] | //h1' )->item( 0 );
         if ( $h1 ) $title = trim( $h1->textContent );
     }
     if ( ! $title ) return null;
 
-    // Дата
-    $date_raw = '';
+    // Дата (сохраняем ссылку на узел, чтобы пропустить его при сборе контента)
+    $date_raw  = '';
+    $date_node = null;
     foreach ( $xpath->query( './/div[@style]', $container ) as $div ) {
         if ( strpos( $div->getAttribute( 'style' ), 'a9a9a9' ) !== false ) {
-            $date_raw = trim( $div->textContent );
+            $date_raw  = trim( $div->textContent );
+            $date_node = $div;
             break;
         }
     }
@@ -652,14 +655,15 @@ function dbi_parse_article( string $html, string $source_url ): ?array {
     }
     $date = dbi_parse_date( $date_raw );
 
-    // Обложка
-    $image_url = $image_name = '';
-    $img_node = $xpath->query( './/*[contains(@class,"img-thum")]//img', $container )->item( 0 );
-    if ( ! $img_node ) {
-        $img_node = $xpath->query( '//*[contains(@class,"wp-post-image")]' )->item( 0 );
+    // Обложка (миниатюра поста)
+    $image_url     = $image_name = '';
+    $img_thum_node = $xpath->query( './/*[contains(@class,"img-thum")]', $container )->item( 0 );
+    $cover_img     = $img_thum_node ? $xpath->query( './/img', $img_thum_node )->item( 0 ) : null;
+    if ( ! $cover_img ) {
+        $cover_img = $xpath->query( '//*[contains(@class,"wp-post-image")]' )->item( 0 );
     }
-    if ( $img_node ) {
-        $src = $img_node->getAttribute( 'src' );
+    if ( $cover_img ) {
+        $src = $cover_img->getAttribute( 'src' );
         if ( $src ) $image_url = dbi_normalize_image_url( $src );
     }
     if ( ! $image_url ) {
@@ -668,13 +672,64 @@ function dbi_parse_article( string $html, string $source_url ): ?array {
     }
     if ( $image_url ) $image_name = basename( parse_url( $image_url, PHP_URL_PATH ) );
 
-    // Контент: <p> и <blockquote>, без <figure>
+    // Контент: обходим прямые дочерние элементы контейнера.
+    // Пропускаем заголовочные узлы (h2, дата, обложка), скрипты и виджеты шеринга.
+    // Удаляем ссылки «Больше фотографий.».
+    $skip_nodes     = array_filter( [ $h2_node, $date_node, $img_thum_node ] );
+    $junk_substrings = [ 'uptolike', 'sharing', 'addthis', 'yashare', 'adsbygoogle', 'sharedaddy' ];
+
     $content = '';
-    foreach ( $xpath->query(
-        './/p[not(ancestor::figure) and not(ancestor::blockquote)] | .//blockquote[not(ancestor::figure)]',
-        $container
-    ) as $node ) {
-        $content .= dbi_node_to_html( $dom, $node );
+    foreach ( $container->childNodes as $child ) {
+        if ( $child->nodeType !== XML_ELEMENT_NODE ) continue;
+
+        // Пропускаем заголовочные элементы
+        $is_header = false;
+        foreach ( $skip_nodes as $skip ) {
+            if ( $child->isSameNode( $skip ) ) { $is_header = true; break; }
+        }
+        if ( $is_header ) continue;
+
+        // Пропускаем скрипты и стили
+        if ( in_array( strtolower( $child->nodeName ), [ 'script', 'style', 'noscript' ], true ) ) continue;
+
+        // Пропускаем виджеты шеринга/рекламы
+        $cls = strtolower( $child->getAttribute( 'class' ) );
+        $id  = strtolower( $child->getAttribute( 'id' ) );
+        $is_junk = false;
+        foreach ( $junk_substrings as $junk ) {
+            if ( strpos( $cls, $junk ) !== false || strpos( $id, $junk ) !== false ) {
+                $is_junk = true;
+                break;
+            }
+        }
+        if ( $is_junk ) continue;
+
+        // Удаляем ссылки «Больше фотографий.»
+        $links_to_remove = [];
+        foreach ( $xpath->query( './/a', $child ) as $a ) {
+            if ( mb_stripos( trim( $a->textContent ), 'Больше фотографий' ) !== false ) {
+                $links_to_remove[] = $a;
+            }
+        }
+        foreach ( $links_to_remove as $a ) {
+            if ( $a->parentNode ) $a->parentNode->removeChild( $a );
+        }
+
+        // Включаем только элементы с текстом или изображениями
+        $has_img = $xpath->query( './/img', $child )->length > 0;
+        if ( trim( $child->textContent ) === '' && ! $has_img ) continue;
+
+        $content .= dbi_node_to_html( $dom, $child );
+    }
+
+    // Fallback: если контейнер использует <p>/<blockquote> (другая структура)
+    if ( trim( strip_tags( $content ) ) === '' && strpos( $content, '<img' ) === false ) {
+        foreach ( $xpath->query(
+            './/p[not(ancestor::figure) and not(ancestor::blockquote)] | .//blockquote[not(ancestor::figure)]',
+            $container
+        ) as $node ) {
+            $content .= dbi_node_to_html( $dom, $node );
+        }
     }
 
     return compact( 'title', 'date', 'content', 'image_url', 'image_name' );
