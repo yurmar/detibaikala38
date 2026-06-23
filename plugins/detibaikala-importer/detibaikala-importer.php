@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: Deti Baikala Importer
- * Description: Импорт новостей с detibaikala.com в рубрику «Новости» (ID=1)
- * Version: 2.0
+ * Description: Импорт материалов с detibaikala.com (категория SMI, ID=2)
+ * Version: 2.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'DBI_CATEGORY_ID',  1 );
-define( 'DBI_BASE_URL',     'https://detibaikala.com/category/news/' );
-define( 'DBI_TOTAL_PAGES',  68 );
+define( 'DBI_CATEGORY_ID',  2 );
+define( 'DBI_BASE_URL',     'https://detibaikala.com/category/smi/' );
+define( 'DBI_TOTAL_PAGES',  20 );
 define( 'DBI_OPTION_URLS',  'dbi_collected_urls' );
 define( 'DBI_OPTION_DONE',  'dbi_imported_urls' );
 define( 'DBI_OPTION_LOG',   'dbi_import_log' );
@@ -36,21 +36,21 @@ function dbi_admin_page() {
     $done_cnt  = count( $done );
     $remaining = array_values( array_diff( $urls, $done ) );
 
-    // Строим массив всех 68 URL для сбора
+    // Строим массив всех URL для сбора
     $collect_pages = [ DBI_BASE_URL ];
     for ( $i = 2; $i <= DBI_TOTAL_PAGES; $i++ ) {
-        $collect_pages[] = 'https://detibaikala.com/category/news/page/' . $i . '/';
+        $collect_pages[] = rtrim( DBI_BASE_URL, '/' ) . '/page/' . $i . '/';
     }
     ?>
     <div class="wrap">
-        <h1>Импорт новостей с detibaikala.com</h1>
+        <h1>Импорт материалов с detibaikala.com</h1>
 
         <!-- ── Шаг 1: сбор ссылок ── -->
         <div style="background:#fff;border:1px solid #c3c4c7;padding:16px 20px;margin-bottom:20px;max-width:760px">
             <h3 style="margin-top:0">Шаг 1 — Собрать ссылки со всех страниц категории</h3>
             <p style="color:#666;margin-top:0">
                 Автоматически обойдёт все <?= DBI_TOTAL_PAGES ?> страниц
-                <code>detibaikala.com/category/news/</code> и соберёт ссылки на статьи.
+                <code><?= DBI_BASE_URL ?></code> и соберёт ссылки на статьи.
             </p>
 
             <button id="btn-collect-all" class="button button-primary">Собрать все ссылки (<?= DBI_TOTAL_PAGES ?> страниц)</button>
@@ -715,9 +715,10 @@ function dbi_parse_article( string $html, string $source_url ): ?array {
             if ( $a->parentNode ) $a->parentNode->removeChild( $a );
         }
 
-        // Включаем только элементы с текстом или изображениями
+        // Включаем элементы с текстом, изображениями или iframe (встроенное видео)
+        $tag     = strtolower( $child->nodeName );
         $has_img = $xpath->query( './/img', $child )->length > 0;
-        if ( trim( $child->textContent ) === '' && ! $has_img ) continue;
+        if ( trim( $child->textContent ) === '' && ! $has_img && $tag !== 'iframe' ) continue;
 
         $content .= dbi_node_to_html( $dom, $child );
     }
