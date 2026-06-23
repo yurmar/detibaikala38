@@ -7,9 +7,9 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'DBI_CATEGORY_ID',  2 );
-define( 'DBI_BASE_URL',     'https://detibaikala.com/category/smi/' );
-define( 'DBI_TOTAL_PAGES',  20 );
+define( 'DBI_CATEGORY_ID',  1 );
+define( 'DBI_BASE_URL',     'https://detibaikala.com/category/news/' );
+define( 'DBI_TOTAL_PAGES',  68 );
 define( 'DBI_OPTION_URLS',  'dbi_collected_urls' );
 define( 'DBI_OPTION_DONE',  'dbi_imported_urls' );
 define( 'DBI_OPTION_LOG',   'dbi_import_log' );
