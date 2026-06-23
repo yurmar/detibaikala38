@@ -8,7 +8,7 @@ get_header();
 while ( have_posts() ) :
 	the_post();
 
-	$is_media   = has_category( 'smi-o-fonde' );
+	$is_media   = has_category( 'smi' );
 	$categories = get_the_category();
 	$back_url   = $is_media ? db_get_page_by_template( 'page-media.php' ) : ( ! empty( $categories ) ? get_category_link( $categories[0]->term_id ) : get_permalink( get_option( 'page_for_posts' ) ) );
 	$back_label = $is_media ? __( '← Все материалы', 'deti-baikala' ) : __( '← Все новости', 'deti-baikala' );
