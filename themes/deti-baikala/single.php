@@ -9,10 +9,9 @@ while ( have_posts() ) :
 	the_post();
 
 	$is_media   = has_category( 'smi-o-fonde' );
-	$section    = $is_media ? __( 'СМИ о фонде', 'deti-baikala' ) : __( 'Новости фонда', 'deti-baikala' );
-	$back_url   = $is_media ? db_get_page_by_template( 'page-media.php' ) : get_permalink( get_option( 'page_for_posts' ) );
-	$back_label = $is_media ? __( '← Все материалы', 'deti-baikala' ) : __( '← Все новости', 'deti-baikala' );
 	$categories = get_the_category();
+	$back_url   = $is_media ? db_get_page_by_template( 'page-media.php' ) : ( ! empty( $categories ) ? get_category_link( $categories[0]->term_id ) : get_permalink( get_option( 'page_for_posts' ) ) );
+	$back_label = $is_media ? __( '← Все материалы', 'deti-baikala' ) : __( '← Все новости', 'deti-baikala' );
 	?>
 
 <div class="page-wrap">
@@ -21,16 +20,13 @@ while ( have_posts() ) :
       <a href="<?php echo esc_url( $back_url ); ?>" class="article-back"><?php echo esc_html( $back_label ); ?></a>
     <?php endif; ?>
 
-    <div class="section-label"><?php echo esc_html( $section ); ?></div>
     <h1 class="page-title"><?php the_title(); ?></h1>
 
     <div class="article-meta">
       <?php if ( ! empty( $categories ) ) : ?>
-        <span class="article-meta__tag"><?php echo esc_html( $categories[0]->name ); ?></span>
+        <a class="article-meta__tag" href="<?php echo esc_url( get_category_link( $categories[0]->term_id ) ); ?>"><?php echo esc_html( $categories[0]->name ); ?></a>
       <?php endif; ?>
       <span><?php echo esc_html( get_the_date() ); ?></span>
-      <span>·</span>
-      <span><?php esc_html_e( 'Автор:', 'deti-baikala' ); ?> <?php the_author(); ?></span>
     </div>
 
     <?php if ( has_post_thumbnail() ) : ?>
@@ -57,30 +53,6 @@ while ( have_posts() ) :
       <?php db_render_social_icons(); ?>
     </div>
 
-    <?php
-    $related = new WP_Query(
-        array(
-            'post_type'      => 'post',
-            'category__in'   => wp_list_pluck( $categories, 'term_id' ),
-            'posts_per_page' => 3,
-            'post__not_in'   => array( get_the_ID() ),
-        )
-    );
-    if ( $related->have_posts() ) :
-    ?>
-      <div class="related-news">
-        <div class="related-news__title"><?php esc_html_e( 'Похожие новости', 'deti-baikala' ); ?></div>
-        <div class="related-news__grid">
-          <?php
-          while ( $related->have_posts() ) :
-              $related->the_post();
-              get_template_part( 'template-parts/news-card' );
-          endwhile;
-          wp_reset_postdata();
-          ?>
-        </div>
-      </div>
-    <?php endif; ?>
   </main>
 
   <?php get_template_part( 'template-parts/sidebar' ); ?>
