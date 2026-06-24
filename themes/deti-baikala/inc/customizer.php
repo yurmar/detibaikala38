@@ -107,9 +107,25 @@ function db_customize_register( $wp_customize ) {
 		)
 	);
 
-	db_add_setting( $wp_customize, 'db_social_vk', __( 'ВКонтакте', 'deti-baikala' ), 'url', 'db_social', '' );
+	$icon_choices = array(
+		'vk'       => __( 'ВКонтакте', 'deti-baikala' ),
+		'ok'       => __( 'Одноклассники', 'deti-baikala' ),
+		'max'      => __( 'MAX (Макс)', 'deti-baikala' ),
+		'telegram' => 'Telegram',
+		'youtube'  => 'YouTube',
+		'rutube'   => 'Rutube',
+	);
+
+	db_add_setting( $wp_customize, 'db_social_vk_icon', __( 'ВКонтакте — иконка', 'deti-baikala' ), 'select', 'db_social', 'vk', '', $icon_choices );
+	db_add_setting( $wp_customize, 'db_social_vk', __( 'ВКонтакте — ссылка', 'deti-baikala' ), 'url', 'db_social', '' );
+
+	db_add_setting( $wp_customize, 'db_social_ok_icon', __( 'Одноклассники — иконка', 'deti-baikala' ), 'select', 'db_social', 'ok', '', $icon_choices );
+	db_add_setting( $wp_customize, 'db_social_ok', __( 'Одноклассники — ссылка', 'deti-baikala' ), 'url', 'db_social', '' );
+
+	db_add_setting( $wp_customize, 'db_social_max_icon', __( 'MAX (Макс) — иконка', 'deti-baikala' ), 'select', 'db_social', 'max', '', $icon_choices );
+	db_add_setting( $wp_customize, 'db_social_max', __( 'MAX (Макс) — ссылка', 'deti-baikala' ), 'url', 'db_social', '' );
+
 	db_add_setting( $wp_customize, 'db_social_telegram', __( 'Telegram', 'deti-baikala' ), 'url', 'db_social', '' );
-	db_add_setting( $wp_customize, 'db_social_ok', __( 'Одноклассники', 'deti-baikala' ), 'url', 'db_social', '' );
 	db_add_setting( $wp_customize, 'db_social_rutube', __( 'Rutube', 'deti-baikala' ), 'url', 'db_social', '' );
 	db_add_setting( $wp_customize, 'db_social_youtube', __( 'YouTube', 'deti-baikala' ), 'url', 'db_social', '' );
 
@@ -195,13 +211,14 @@ add_action( 'customize_register', 'db_customize_register' );
 /**
  * Хелпер для регистрации настроек + контролов с автоматическим sanitize.
  */
-function db_add_setting( $wp_customize, $id, $label, $type, $section, $default = '', $description = '' ) {
+function db_add_setting( $wp_customize, $id, $label, $type, $section, $default = '', $description = '', $choices = array() ) {
 	$sanitize_map = array(
 		'text'     => 'sanitize_text_field',
 		'textarea' => 'sanitize_textarea_field',
 		'url'      => 'esc_url_raw',
 		'checkbox' => 'db_sanitize_checkbox',
 		'image'    => 'esc_url_raw',
+		'select'   => 'sanitize_key',
 	);
 
 	$wp_customize->add_setting(
@@ -230,6 +247,10 @@ function db_add_setting( $wp_customize, $id, $label, $type, $section, $default =
 		$wp_customize->add_control(
 			new WP_Customize_Image_Control( $wp_customize, $id, $args )
 		);
+	} elseif ( 'select' === $type ) {
+		$args['type']    = 'select';
+		$args['choices'] = $choices;
+		$wp_customize->add_control( $id, $args );
 	} else {
 		$args['type'] = ( 'url' === $type ) ? 'url' : 'text';
 		$wp_customize->add_control( $id, $args );

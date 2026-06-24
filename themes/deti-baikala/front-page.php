@@ -41,6 +41,9 @@ $hero_bg = get_theme_mod( 'db_hero_bg', '' );
             <a href="<?php echo esc_url( $btn2_url ? $btn2_url : '#' ); ?>" class="btn btn-outline"><?php echo esc_html( $btn2_text ); ?></a>
         <?php endif; ?>
       </div>
+      <div class="hero__socials">
+        <?php db_render_social_icons(); ?>
+      </div>
     </div>
   </div>
 </section>
