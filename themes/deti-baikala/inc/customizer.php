@@ -97,6 +97,8 @@ function db_customize_register( $wp_customize ) {
 	db_add_setting( $wp_customize, 'db_contact_email_partners', __( 'Email для партнёров', 'deti-baikala' ), 'text', 'db_contacts', 'partners@detibaikala.ru' );
 	db_add_setting( $wp_customize, 'db_contact_email_press', __( 'Email для прессы', 'deti-baikala' ), 'text', 'db_contacts', 'press@detibaikala.ru' );
 	db_add_setting( $wp_customize, 'db_contact_email_volunteer', __( 'Email для волонтёров', 'deti-baikala' ), 'text', 'db_contacts', 'volunteer@detibaikala.ru' );
+	db_add_setting( $wp_customize, 'db_contact_link_title', __( 'Дополнительная ссылка — название', 'deti-baikala' ), 'text', 'db_contacts', '' );
+	db_add_setting( $wp_customize, 'db_contact_link_url', __( 'Дополнительная ссылка — адрес', 'deti-baikala' ), 'url', 'db_contacts', '' );
 
 	/* ---------------------------- SOCIAL ---------------------------- */
 	$wp_customize->add_section(

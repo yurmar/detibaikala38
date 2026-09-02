@@ -76,6 +76,14 @@ while ( have_posts() ) :
           <div class="contact-block__sub"><?php esc_html_e( 'Хотите помочь? Напишите нам!', 'deti-baikala' ); ?></div>
         </div>
       <?php endif; ?>
+
+      <?php if ( get_theme_mod( 'db_contact_link_url' ) ) : ?>
+        <div class="contact-block">
+          <div class="contact-block__icon">🔗</div>
+          <div class="contact-block__label"><?php echo esc_html( get_theme_mod( 'db_contact_link_title' ) ? get_theme_mod( 'db_contact_link_title' ) : __( 'Ссылка', 'deti-baikala' ) ); ?></div>
+          <div class="contact-block__value"><a href="<?php echo esc_url( get_theme_mod( 'db_contact_link_url' ) ); ?>" target="_blank" rel="noopener"><?php echo esc_html( get_theme_mod( 'db_contact_link_url' ) ); ?></a></div>
+        </div>
+      <?php endif; ?>
     </div>
 
     <!-- Contact form -->
