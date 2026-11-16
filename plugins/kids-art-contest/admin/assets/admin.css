@@ -1,0 +1,118 @@
+/* Конкурс детского рисунка — админка. Перенесено из mockups/index.html (блок «WordPress админка»), правила под .kac-a. */
+.kac-a,.kac-a *{box-sizing:border-box}
+.kac-a h1.kh{font-size:23px;font-weight:400;margin:6px 0 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0}
+.kac-a .kpb h2{font-size:14px}
+.kac-a .wpbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid #2271b1;color:#2271b1;background:#f6f7f7;border-radius:3px;padding:0 10px;min-height:30px;font-size:13px;line-height:2;white-space:nowrap}
+.kac-a .wpbtn.primary{background:#2271b1;color:#fff}
+.kac-a .wpbtn.danger{border-color:#d63638;color:#d63638}
+.kac-a .wpbtn.ok{border-color:#00a32a;color:#fff;background:#00a32a}
+.kac-a .wpbtn.sm{min-height:26px;padding:0 8px;font-size:12px}
+.kac-a .sub3{font-size:13px;color:#646970;margin-bottom:10px}
+.kac-a .sub3 a{color:#2271b1;text-decoration:none;cursor:pointer}
+.kac-a .sub3 a.cur{color:#1d2327;font-weight:600}
+.kac-a .wpt{width:100%;border-collapse:collapse;background:#fff;border:1px solid #c3c4c7;box-shadow:0 1px 1px rgba(0,0,0,.04)}
+.kac-a .wpt th{text-align:left;font-weight:400;padding:8px 10px;border-bottom:1px solid #c3c4c7;color:#2c3338;font-size:13px;white-space:nowrap}
+.kac-a .wpt td{padding:9px 10px;vertical-align:top;border-bottom:1px solid #f0f0f1;font-size:13px}
+.kac-a .wpt tr:nth-child(even) td{background:#f6f7f7}
+.kac-a .wpt a{color:#2271b1;text-decoration:none}
+.kac-a .wpt .ttl{font-weight:600;font-size:14px;color:#2271b1}
+.kac-a .wpt .ra{font-size:12px;color:#a7aaad;margin-top:4px}
+.kac-a .wpt .ra a{color:#2271b1}
+.kac-a .wpt .ra .del{color:#b32d2e}
+.kac-a .pill{display:inline-block;border-radius:10px;padding:1px 8px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.kac-a .pill.green{background:#d1f1dc;color:#0a6b2a}
+.kac-a .pill.blue{background:#dbeafe;color:#1d4ed8}
+.kac-a .pill.gray{background:#eceff1;color:#50575e}
+.kac-a .pill.orange{background:#fdecc8;color:#8a4b00}
+.kac-a .pill.red{background:#fde2e1;color:#a4161a}
+.kac-a .pill.purple{background:#ede7ff;color:#5b34c7}
+.kac-a .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kac-a .kpi{background:#fff;border:1px solid #c3c4c7;padding:12px 14px;border-left:4px solid #2271b1}
+.kac-a .kpi b{display:block;font-size:24px;font-weight:600;margin-bottom:2px}
+.kac-a .kpi span{color:#646970;font-size:12.5px}
+.kac-a .kpi.warn{border-left-color:#dba617}
+.kac-a .kpi.err{border-left-color:#d63638}
+.kac-a .kpi.ok{border-left-color:#00a32a}
+.kac-a .kpb{background:#fff;border:1px solid #c3c4c7;margin-bottom:16px}
+.kac-a .kpb h2{font-size:14px;margin:0;padding:9px 12px;border-bottom:1px solid #c3c4c7;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.kac-a .kpb .in{padding:12px}
+.kac-a .kcols{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:18px;align-items:start}
+.kac-a .wpf{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 16px;align-items:center;margin-bottom:12px}
+.kac-a .wpf label{font-weight:600}
+.kac-a .wpf .d{grid-column:2;color:#646970;font-size:12px;margin-top:-4px}
+.kac-a .wpi{border:1px solid #8c8f94;border-radius:4px;padding:0 8px;min-height:30px;font-size:14px;background:#fff;color:#2c3338}
+.kac-a .wpi.w100{width:100%}
+.kac-a .wpi.w80{width:80px}
+.kac-a .wpi.w200{width:200px}
+.kac-a .rep{display:grid;grid-template-columns:minmax(0,1fr) 80px 80px 30px;gap:8px;align-items:center;margin-bottom:6px}
+.kac-a .rep.h{font-size:12px;color:#646970;font-weight:600}
+.kac-a .knotice{border-left:4px solid #72aee6;background:#fff;padding:9px 12px;margin-bottom:14px;box-shadow:0 1px 1px rgba(0,0,0,.04);font-size:13px}
+.kac-a .knotice.warn{border-left-color:#dba617}
+.kac-a .knotice.err{border-left-color:#d63638}
+.kac-a .knotice.ok{border-left-color:#00a32a}
+.kac-a .tl{display:flex;margin:6px 0 2px;font-size:11px;font-weight:600}
+.kac-a .tl div{flex:1;padding:6px 6px;color:#fff;text-align:center}
+.kac-a .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px}
+.kac-a .mcard{background:#fff;border:1px solid #c3c4c7;position:relative;transition:.3s;display:flex;flex-direction:column}
+.kac-a .mcard.gone{opacity:0;transform:scale(.9)}
+.kac-a .mcard .im{aspect-ratio:1;position:relative;cursor:zoom-in}
+.kac-a .mcard .im img{width:100%;height:100%;object-fit:cover;display:block}
+.kac-a .mcard .cb{position:absolute;left:8px;top:8px;width:18px;height:18px}
+.kac-a .mcard .techi{position:absolute;right:6px;bottom:6px;display:flex;gap:4px}
+.kac-a .mcard .techi span{background:rgba(0,0,0,.65);color:#fff;font-size:10.5px;padding:1px 6px;border-radius:3px}
+.kac-a .mcard .bd{padding:8px 10px;font-size:12.5px;line-height:1.45;flex:1}
+.kac-a .mcard .bd b{font-size:13.5px;display:block}
+.kac-a .mcard .bd .mt{color:#646970}
+.kac-a .mcard .warnl{background:#fcf0d0;color:#7a4d00;font-size:11.5px;padding:4px 8px;margin-top:6px;border-radius:3px}
+.kac-a .mcard .acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 10px 10px}
+.kac-a .mcard .acts button{justify-content:center}
+.kac-a .bulk{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.kac-a .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:10}
+.kac-a .modal-bg.on{display:flex}
+.kac-a .modal{background:#fff;width:460px;max-width:92%;padding:18px 20px;border-radius:4px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.kac-a .modal h3{margin:0 0 10px;font-size:17px;font-weight:600}
+.kac-a .modal label.r{display:flex;gap:8px;padding:5px 0;font-size:13px;align-items:center}
+.kac-a .kbd{display:inline-block;border:1px solid #c3c4c7;border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:11px;background:#fff;font-family:ui-monospace,monospace}
+.kac-a .dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 12px;font-size:13px}
+.kac-a .dl dt{color:#646970}
+.kac-a .dl dd{margin:0}
+.kac-a .log{font-size:12.5px;line-height:1.5}
+.kac-a .log div{padding:6px 0;border-bottom:1px solid #f0f0f1;display:grid;grid-template-columns:96px 1fr;gap:8px}
+.kac-a .log span{color:#646970}
+.kac-a .chart{display:flex;align-items:flex-end;gap:3px;height:120px;padding:8px 0;border-bottom:1px solid #ddd}
+.kac-a .chart i{flex:1;background:#72aee6;border-radius:2px 2px 0 0;min-height:2px}
+.kac-a .chart i.hot{background:#d63638}
+.kac-a .wptabs{display:flex;gap:0;border-bottom:1px solid #c3c4c7;margin-bottom:16px;flex-wrap:wrap}
+.kac-a .wptabs a{padding:8px 14px;font-size:14px;font-weight:600;color:#50575e;background:#e5e5e5;border:1px solid #c3c4c7;border-bottom:0;margin-right:4px;margin-bottom:-1px;cursor:pointer}
+.kac-a .wptabs a.on{background:#f0f0f1;color:#1d2327;border-bottom:1px solid #f0f0f1}
+.kac-a .stab{display:none}
+.kac-a .stab.on{display:block}
+.kac-a .ck{display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:13px}
+.kac-a .ck input{margin-top:2px}
+.kac-a .ck small{display:block;color:#646970}
+.kac-a .yes{color:#00a32a;font-weight:700}
+.kac-a .no{color:#c3c4c7}
+/* ---------- Дополнения реальной админки ---------- */
+.kac-a .kpb h2.kh2{font-size:14px;margin:0;padding:9px 12px;border-bottom:1px solid #c3c4c7;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.kac-a .kpb{margin-bottom:16px}
+.kac-a a.wpbtn{text-decoration:none}
+.kac-a button.wpbtn{cursor:pointer;font-family:inherit}
+.kac-a .wpbtn.ok:hover{background:#008a20}
+.kac-a .mcard{transition:.3s}
+.kac-a .mcard.is-active{outline:2px solid #2271b1;outline-offset:1px}
+.kac-a .mcard .bd a.tt{color:#2271b1;font-weight:600;font-size:13.5px;text-decoration:none;display:block}
+.kac-a .wpt td img.thumb{width:44px;height:44px;object-fit:cover;display:block}
+.kac-a .wpf>div{min-width:0}
+.kac-a .wpf-top{align-items:start}
+.kac-a .modal-bg[hidden]{display:none}
+.kac-a .modal h3{margin:0 0 10px}
+.kac-a .stab[hidden]{display:none}
+.kac-a .chart i.hot{background:#d63638}
+.kac-a .knotice .wpbtn{margin-left:6px}
+.kac-a .tie{background:#fffbe6}
+.kac-a .pv{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100000;display:none;place-items:center;cursor:zoom-out}
+.kac-a .pv.on{display:grid}
+.kac-a .pv img{max-width:94vw;max-height:94vh;border-radius:6px}
+.kac-a .shortcode{font-size:11.5px}
+.kac-a .wpt .ra{font-size:12px;color:#a7aaad}
+@media(max-width:1100px){.kac-a .kcols,.kac-a .kpis{grid-template-columns:1fr}.kac-a .wpf{grid-template-columns:1fr}.kac-a .wpf .d{grid-column:1}}
