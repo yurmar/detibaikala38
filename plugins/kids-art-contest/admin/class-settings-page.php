@@ -104,11 +104,7 @@ class KAC_Settings_Page {
 		if ( $role ) {
 			$granted = isset( $in['mod_caps'] ) ? array_map( 'sanitize_key', (array) $in['mod_caps'] ) : array();
 			foreach ( kac_all_caps() as $cap ) {
-				if ( 'kac_manage_settings' === $cap ) {
-					$role->remove_cap( $cap ); // Нельзя выдать.
-				} else {
-					in_array( $cap, $granted, true ) ? $role->add_cap( $cap ) : $role->remove_cap( $cap );
-				}
+				in_array( $cap, $granted, true ) ? $role->add_cap( $cap ) : $role->remove_cap( $cap );
 			}
 		}
 		return $new;
@@ -273,7 +269,7 @@ class KAC_Settings_Page {
 					?>
 					<table class="wpt"><thead><tr><th><?php esc_html_e( 'Право (capability)', 'kids-art-contest' ); ?></th><th><?php esc_html_e( 'Что даёт', 'kids-art-contest' ); ?></th><th><?php esc_html_e( 'Администратор', 'kids-art-contest' ); ?></th><th><?php esc_html_e( 'Модератор конкурса', 'kids-art-contest' ); ?></th></tr></thead><tbody>
 					<?php foreach ( $caps as $cap => $desc ) : ?>
-						<tr><td><code><?php echo esc_html( $cap ); ?></code></td><td><?php echo esc_html( $desc ); ?></td><td class="yes">✓</td><td><input type="checkbox" name="<?php echo esc_attr( self::n( 'mod_caps' ) ); ?>[]" value="<?php echo esc_attr( $cap ); ?>" <?php checked( $role && $role->has_cap( $cap ) ); ?> <?php disabled( 'kac_manage_settings' === $cap ); ?>></td></tr>
+						<tr><td><code><?php echo esc_html( $cap ); ?></code></td><td><?php echo esc_html( $desc ); ?></td><td class="yes">✓</td><td><input type="checkbox" name="<?php echo esc_attr( self::n( 'mod_caps' ) ); ?>[]" value="<?php echo esc_attr( $cap ); ?>" <?php checked( $role && $role->has_cap( $cap ) ); ?>></td></tr>
 					<?php endforeach; ?>
 					</tbody></table>
 					<p style="color:#646970;margin-top:10px"><?php esc_html_e( 'Роль назначается в «Пользователи → Добавить». Все проверки в коде идут через current_user_can(), поэтому эти права можно выдать и любой другой роли.', 'kids-art-contest' ); ?></p>

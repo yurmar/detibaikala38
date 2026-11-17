@@ -70,6 +70,17 @@ final class KAC_Plugin {
 	public function on_plugins_loaded(): void {
 		load_plugin_textdomain( 'kids-art-contest', false, dirname( plugin_basename( KAC_FILE ) ) . '/languages' );
 
+		// Одноразово выдаём существующей роли модератора все права (все разделы меню).
+		if ( '2' !== get_option( 'kac_roles_ver' ) ) {
+			$mod = get_role( 'kac_moderator' );
+			if ( $mod ) {
+				foreach ( kac_all_caps() as $cap ) {
+					$mod->add_cap( $cap );
+				}
+			}
+			update_option( 'kac_roles_ver', '2' );
+		}
+
 		// Обновление схемы БД после апдейта плагина.
 		if ( get_option( 'kac_db_version' ) !== KAC_DB_VERSION ) {
 			KAC_Activator::install();

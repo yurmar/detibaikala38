@@ -147,12 +147,7 @@ function kac_all_caps(): array {
  * @return string[]
  */
 function kac_moderator_default_caps(): array {
-	return array(
-		'kac_moderate_works',
-		'kac_edit_works',
-		'kac_view_personal_data',
-		'kac_view_votes',
-	);
+	return kac_all_caps(); // Модератор видит все разделы «Конкурса рисунков».
 }
 
 /**
