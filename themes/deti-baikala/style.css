@@ -219,6 +219,8 @@ body.admin-bar .mobile-nav{top:calc(68px + 32px)}
 /* ===== PAGE LAYOUT (with sidebar) ===== */
 .page-wrap{max-width:1200px;margin:0 auto;padding:6rem 1.5rem 4rem;display:grid;grid-template-columns:1fr 320px;gap:2.5rem;align-items:start}
 .page-main{min-width:0}
+.kac-wrap{max-width:1200px;margin:0 auto;padding:6rem 1.5rem 4rem}
+@media(max-width:768px){.kac-wrap{padding:5rem 0.75rem 3rem}}
 .sidebar{display:flex;flex-direction:column;gap:1.5rem}
 .sidebar-widget{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius);padding:1.25rem;overflow:hidden}
 .sidebar-widget__title{font-family:'Montserrat',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border-subtle)}
