@@ -37,7 +37,7 @@
 .kac .countdown .cd div{flex:1;background:#fff7ea;border-radius:14px;padding:10px 0;text-align:center}
 .kac .countdown .cd b{display:block;font-size:30px;font-weight:900;line-height:1}
 .kac .countdown .cd span{font-size:12px;color:#888}
-.kac .stats{display:flex;gap:10px}
+.kac .stats{display:flex;gap:10px;background:none;padding:0}
 .kac .stats div{flex:1;border:1px dashed #eadfc9;border-radius:14px;padding:10px;text-align:center}
 .kac .stats b{display:block;font-size:20px;font-weight:900}
 .kac .stats span{font-size:12px;color:#888}
