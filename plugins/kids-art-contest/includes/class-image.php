@@ -133,7 +133,14 @@ class KAC_Image {
 			$editor->maybe_exif_rotate();
 		}
 		if ( kac_setting( 'strip_exif' ) && method_exists( $editor, 'strip_meta' ) ) {
-			$editor->strip_meta(); // Imagick: убрать EXIF/профили (GD теряет их при перекодировании).
+			// Imagick: убрать EXIF/профили (GD теряет их при перекодировании). Метод protected — вызываем в контексте редактора.
+			try {
+				( function () {
+					$this->strip_meta();
+				} )->call( $editor );
+			} catch ( \Throwable $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement
+				// Не критично: оригинал сохранится без очистки метаданных.
+			}
 		}
 		$editor->set_quality( 92 );
 		$saved = $editor->save( $orig, $meta['mime'] );
