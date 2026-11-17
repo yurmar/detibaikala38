@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'KAC_VERSION', '1.0.1' );
+define( 'KAC_VERSION', '1.0.2' );
 define( 'KAC_DB_VERSION', '2' );
 define( 'KAC_FILE', __FILE__ );
 define( 'KAC_DIR', plugin_dir_path( __FILE__ ) );

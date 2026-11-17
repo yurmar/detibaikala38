@@ -23,7 +23,7 @@
 .kac .badge.live::before{content:"";width:8px;height:8px;border-radius:50%;background:#22b88f;box-shadow:0 0 0 4px rgba(34,184,143,.2)}
 .kac .badge.soon{background:#fff1cf;color:#8a5a00}
 .kac .badge.done{background:#ece8ff;color:#5838c9}
-.kac .hero{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:center;padding:30px 28px;background:
+.kac .hero{min-height:0;overflow:visible;display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:center;padding:30px 28px;background:
   radial-gradient(circle at 92% 12%,#ffe3a3 0 70px,transparent 71px),
   radial-gradient(circle at 76% 92%,#cfe8ff 0 90px,transparent 91px),
   radial-gradient(circle at 4% 100%,#ffd9d3 0 80px,transparent 81px),#fff4e4}
