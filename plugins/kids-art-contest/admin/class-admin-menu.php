@@ -10,6 +10,7 @@ class KAC_Admin_Menu {
 
 	public static function init(): void {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
+		add_action( 'admin_notices', array( __CLASS__, 'last_error_notice' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
 		add_filter( 'login_redirect', array( __CLASS__, 'login_redirect' ), 10, 3 );
 		add_filter( 'parent_file', array( __CLASS__, 'parent_file' ) );
@@ -70,6 +71,31 @@ class KAC_Admin_Menu {
 		}
 		// Скрытая страница карточки работы.
 		add_submenu_page( 'options.php', __( 'Карточка работы', 'kids-art-contest' ), __( 'Карточка работы', 'kids-art-contest' ), 'kac_edit_works', 'kac-work', array( 'KAC_Work_Page', 'render_card' ) );
+	}
+
+	/** Последняя ошибка при отправке рисунка (для диагностики). */
+	public static function last_error_notice(): void {
+		$e = get_option( 'kac_last_error' );
+		if ( ! $e || ! current_user_can( 'kac_moderate_works' ) ) {
+			return;
+		}
+		if ( isset( $_GET['kac_clear_error'] ) && check_admin_referer( 'kac_clear_error' ) ) { // phpcs:ignore
+			delete_option( 'kac_last_error' );
+			return;
+		}
+		$screen = get_current_screen();
+		if ( ! $screen || false === strpos( (string) $screen->id, 'kac' ) ) {
+			return;
+		}
+		printf(
+			'<div class="notice notice-error"><p><b>%s</b> %s — %s (%s). <a href="%s">%s</a></p></div>',
+			esc_html__( 'Сбой при отправке рисунка:', 'kids-art-contest' ),
+			esc_html( wp_date( 'd.m.Y H:i', (int) $e['time'] ) ),
+			esc_html( (string) $e['msg'] ),
+			esc_html( (string) $e['file'] ),
+			esc_url( wp_nonce_url( add_query_arg( 'kac_clear_error', 1 ), 'kac_clear_error' ) ),
+			esc_html__( 'Скрыть', 'kids-art-contest' )
+		);
 	}
 
 	public static function menu_icon_css(): void {

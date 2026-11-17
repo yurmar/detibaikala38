@@ -10,6 +10,24 @@ class KAC_Submission {
 	 * Обработка POST /works.
 	 */
 	public static function handle( WP_REST_Request $req ) {
+		// Диагностика: фатальную ошибку PHP (память, таймаут) запоминаем, чтобы админ видел причину.
+		register_shutdown_function(
+			static function () {
+				$e = error_get_last();
+				if ( $e && in_array( $e['type'], array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR ), true ) ) {
+					update_option( 'kac_last_error', array( 'time' => time(), 'msg' => $e['message'], 'file' => basename( (string) $e['file'] ) . ':' . $e['line'] ), false );
+				}
+			}
+		);
+		try {
+			return self::do_handle( $req );
+		} catch ( \Throwable $t ) {
+			update_option( 'kac_last_error', array( 'time' => time(), 'msg' => $t->getMessage(), 'file' => basename( $t->getFile() ) . ':' . $t->getLine() ), false );
+			return new WP_Error( 'kac_exception', __( 'Не удалось обработать отправку. Попробуйте ещё раз или уменьшите размер рисунка.', 'kids-art-contest' ), array( 'status' => 500 ) );
+		}
+	}
+
+	private static function do_handle( WP_REST_Request $req ) {
 		global $wpdb;
 
 		if ( ! KAC_Security::check_nonce( (string) $req->get_param( 'kac_nonce' ) ) ) {

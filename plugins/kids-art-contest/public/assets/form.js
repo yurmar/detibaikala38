@@ -177,7 +177,7 @@
 				fd.delete('image'); fd.append('image', file, file.name); fd.append('kac_nonce', nonce);
 				if (capParams) Object.keys(capParams).forEach(function (k) { fd.append(k, capParams[k]); });
 				return fetch(KAC.rest + '/works', { method: 'POST', body: fd, cache: 'no-store' });
-			}).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
+			}).then(function (r) { return r.text().then(function (t) { var d; try { d = JSON.parse(t); } catch (e) { var x = new Error('http'); x.status = r.status; throw x; } return { ok: r.ok, d: d }; }); }).then(function (res) {
 				if (res.ok) {
 					try { localStorage.removeItem(key); } catch (e) {}
 					$('kac-sworktitle').textContent = res.d.title || form.elements.title.value; $('kac-semail').textContent = res.d.email || '';
@@ -196,7 +196,7 @@
 				err.textContent = (Object.keys(fields).map(function (k) { return fields[k]; })[0]) || res.d.message || I.error;
 				if (first) setStep(first);
 				btn.disabled = false; btn.textContent = step < 3 ? I.next : I.submit; capParams = null; if (form.dataset.captcha === '1') showCaptcha();
-			}).catch(function () { err.textContent = I.error; btn.disabled = false; btn.textContent = I.submit; });
+			}).catch(function (e) { err.textContent = I.error + (e && e.status ? ' (код ' + e.status + ')' : ''); btn.disabled = false; btn.textContent = I.submit; });
 		}
 		if (window.KACMask) { /* маска телефона реализована выше (как в макете) */ }
 	}
