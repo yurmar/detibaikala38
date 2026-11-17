@@ -117,6 +117,7 @@ class KAC_Image {
 	public static function process( array $file, array $meta, int $contest_id, int $work_id ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
+		wp_raise_memory_limit( 'image' );
 
 		$ext  = $meta['ext'];
 		$name = wp_generate_password( 20, false ) . '.' . $ext;
@@ -178,7 +179,7 @@ class KAC_Image {
 		return array(
 			'attachment_id' => (int) $att_id,
 			'original_path' => $orig,
-			'dhash'         => self::dhash( $orig ),
+			'dhash'         => self::dhash( $upload['file'] ), // Публичная копия ≤1600 px: полный оригинал в GD съедает память.
 		);
 	}
 

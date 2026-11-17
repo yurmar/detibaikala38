@@ -108,6 +108,11 @@ class KAC_Security {
 	/**
 	 * Простой лимит: не более $max действий за $window секунд на ключ.
 	 */
+	/** Проверка лимита без увеличения счётчика. */
+	public static function rate_exceeded( string $key, int $max ): bool {
+		return (int) get_transient( 'kac_rl_' . md5( $key ) ) >= $max;
+	}
+
 	public static function rate_limit( string $key, int $max, int $window ): bool {
 		$k = 'kac_rl_' . md5( $key );
 		$n = (int) get_transient( $k );

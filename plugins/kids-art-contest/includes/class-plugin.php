@@ -81,6 +81,19 @@ final class KAC_Plugin {
 			update_option( 'kac_roles_ver', '2' );
 		}
 
+		// Одноразово: сброс счётчиков отправок и удаление «пустых» работ от сбойных загрузок.
+		if ( '1' !== get_option( 'kac_fix_submit_ver' ) ) {
+			global $wpdb;
+			$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_kac\_rl\_%' OR option_name LIKE '\_transient\_timeout\_kac\_rl\_%'" ); // phpcs:ignore
+			$orphans = $wpdb->get_col( "SELECT p.ID FROM {$wpdb->posts} p WHERE p.post_type='kac_work' AND p.post_status='kac_pending'
+				AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} m WHERE m.post_id=p.ID AND m.meta_key IN ('_kac_age','_thumbnail_id'))
+				AND NOT EXISTS (SELECT 1 FROM {$wpdb->prefix}kac_participants pt WHERE pt.work_id=p.ID)" ); // phpcs:ignore
+			foreach ( $orphans as $oid ) {
+				wp_delete_post( (int) $oid, true );
+			}
+			update_option( 'kac_fix_submit_ver', '1' );
+		}
+
 		// Обновление схемы БД после апдейта плагина.
 		if ( get_option( 'kac_db_version' ) !== KAC_DB_VERSION ) {
 			KAC_Activator::install();

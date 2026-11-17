@@ -26,7 +26,8 @@ class KAC_Submission {
 		}
 
 		$ip_hash = KAC_Security::hash( KAC_Security::ip() );
-		if ( ! KAC_Security::rate_limit( 'submit_' . $ip_hash, 3, HOUR_IN_SECONDS ) ) {
+		// Неудачные попытки лимит не расходуют: счётчик растёт только после успешной отправки.
+		if ( KAC_Security::rate_exceeded( 'submit_' . $ip_hash, 3 ) ) {
 			return new WP_Error( 'kac_rate', __( 'Слишком много отправок. Попробуйте через час.', 'kids-art-contest' ), array( 'status' => 429 ) );
 		}
 
@@ -71,6 +72,12 @@ class KAC_Submission {
 			return new WP_Error( $meta->get_error_code(), $meta->get_error_message(), array( 'status' => 400, 'fields' => array( 'image' => $meta->get_error_message() ) ) );
 		}
 
+		// Обработка крупных фото требует памяти и времени.
+		wp_raise_memory_limit( 'image' );
+		if ( function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 120 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		}
+
 		$group  = KAC_Contest::group_for_age( $contest_id, $f['age'] );
 		$number = KAC_Contest::next_number( $contest_id );
 		$work_id = wp_insert_post(
@@ -88,6 +95,16 @@ class KAC_Submission {
 		if ( is_wp_error( $work_id ) ) {
 			return new WP_Error( 'kac_save', __( 'Не удалось сохранить работу.', 'kids-art-contest' ), array( 'status' => 500 ) );
 		}
+
+		// Если процесс упадёт (память, таймаут) до конца — не оставляем «пустую» работу на модерации.
+		$finished = false;
+		register_shutdown_function(
+			static function () use ( &$finished, $work_id ) {
+				if ( ! $finished ) {
+					wp_delete_post( $work_id, true );
+				}
+			}
+		);
 
 		$img = KAC_Image::process( $file, $meta, $contest_id, $work_id );
 		if ( is_wp_error( $img ) ) {
@@ -133,11 +150,18 @@ class KAC_Submission {
 			)
 		);
 
+		$finished = true;
+		KAC_Security::rate_limit( 'submit_' . $ip_hash, 3, HOUR_IN_SECONDS );
+
 		KAC_Log::add( 'work', $work_id, 'submitted', array( 'contest' => $contest_id ) );
 		do_action( 'kac_work_submitted', $work_id, $contest_id );
 
-		KAC_Mailer::send( 'received', $work_id );
-		KAC_Mailer::notify_moderators( $work_id );
+		try {
+			KAC_Mailer::send( 'received', $work_id );
+			KAC_Mailer::notify_moderators( $work_id );
+		} catch ( \Throwable $e ) {
+			KAC_Log::add( 'work', $work_id, 'mail_failed', array( 'error' => $e->getMessage() ) );
+		}
 
 		return array(
 			'ok'     => true,
