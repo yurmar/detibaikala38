@@ -116,3 +116,7 @@
 .kac-a .shortcode{font-size:11.5px}
 .kac-a .wpt .ra{font-size:12px;color:#a7aaad}
 @media(max-width:1100px){.kac-a .kcols,.kac-a .kpis{grid-template-columns:1fr}.kac-a .wpf{grid-template-columns:1fr}.kac-a .wpf .d{grid-column:1}}
+
+.kac-toast{position:fixed;right:24px;bottom:32px;z-index:100000;background:#1d2327;color:#fff;border-left:4px solid #00a32a;padding:12px 18px;border-radius:3px;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:0;transform:translateY(10px);transition:opacity .25s,transform .25s;max-width:360px}
+.kac-toast.on{opacity:1;transform:none}
+.kac-toast.err{border-left-color:#d63638}

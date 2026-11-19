@@ -26,6 +26,7 @@ class KAC_REST {
 
 		$can = static fn( string $cap ) => static fn() => current_user_can( $cap );
 		register_rest_route( self::NS, '/admin/works/(?P<id>\d+)/moderate', array( 'methods' => 'POST', 'callback' => array( __CLASS__, 'moderate' ), 'permission_callback' => $can( 'kac_moderate_works' ) ) );
+		register_rest_route( self::NS, '/admin/works/(?P<id>\d+)', array( 'methods' => 'DELETE', 'callback' => array( __CLASS__, 'delete_work' ), 'permission_callback' => $can( 'kac_moderate_works' ) ) );
 		register_rest_route( self::NS, '/admin/works/(?P<id>\d+)', array( 'methods' => 'PATCH', 'callback' => array( __CLASS__, 'patch_work' ), 'permission_callback' => $can( 'kac_edit_works' ) ) );
 		register_rest_route( self::NS, '/admin/works/(?P<id>\d+)/rotate', array( 'methods' => 'POST', 'callback' => array( __CLASS__, 'rotate' ), 'permission_callback' => $can( 'kac_edit_works' ) ) );
 		register_rest_route( self::NS, '/admin/votes/annul', array( 'methods' => 'POST', 'callback' => array( __CLASS__, 'annul' ), 'permission_callback' => $can( 'kac_annul_votes' ) ) );
@@ -132,6 +133,19 @@ class KAC_REST {
 			)
 		);
 		return is_wp_error( $res ) ? $res : array( 'ok' => true, 'status' => $res );
+	}
+
+	public static function delete_work( WP_REST_Request $req ) {
+		$id = absint( $req['id'] );
+		$w  = get_post( $id );
+		if ( ! $w || 'kac_work' !== $w->post_type ) {
+			return new WP_Error( 'not_found', 'Работа не найдена', array( 'status' => 404 ) );
+		}
+		KAC_Log::add( 'work', $id, 'deleted', array( 'title' => $w->post_title, 'contest' => (int) $w->post_parent ) );
+		if ( ! wp_delete_post( $id, true ) ) {
+			return new WP_Error( 'delete_failed', 'Не удалось удалить работу', array( 'status' => 500 ) );
+		}
+		return array( 'ok' => true );
 	}
 
 	public static function patch_work( WP_REST_Request $req ) {

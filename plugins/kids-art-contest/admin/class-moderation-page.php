@@ -94,7 +94,7 @@ class KAC_Moderation_Page {
 				<input class="wpi w200" type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php echo esc_attr( $see_pd ? __( 'Поиск: ФИО, email, №', 'kids-art-contest' ) : __( 'Поиск: название, №', 'kids-art-contest' ) ); ?>">
 				<span style="flex:1"></span>
 				<label class="ck" style="margin:0"><input type="checkbox" id="kac-pickall"> <?php esc_html_e( 'Выбрать все', 'kids-art-contest' ); ?></label>
-				<select class="wpi" id="kac-bulk-action"><option value=""><?php esc_html_e( 'Действия', 'kids-art-contest' ); ?></option><option value="approve"><?php esc_html_e( 'Одобрить', 'kids-art-contest' ); ?></option><option value="reject"><?php esc_html_e( 'Отклонить…', 'kids-art-contest' ); ?></option><option value="disqualify"><?php esc_html_e( 'Дисквалифицировать…', 'kids-art-contest' ); ?></option></select>
+				<select class="wpi" id="kac-bulk-action"><option value=""><?php esc_html_e( 'Действия', 'kids-art-contest' ); ?></option><option value="approve"><?php esc_html_e( 'Одобрить', 'kids-art-contest' ); ?></option><option value="reject"><?php esc_html_e( 'Отклонить…', 'kids-art-contest' ); ?></option><option value="disqualify"><?php esc_html_e( 'Дисквалифицировать…', 'kids-art-contest' ); ?></option><option value="delete"><?php esc_html_e( 'Удалить…', 'kids-art-contest' ); ?></option></select>
 				<button type="button" class="wpbtn" id="kac-bulk-apply"><?php esc_html_e( 'Применить', 'kids-art-contest' ); ?></button>
 			</form>
 

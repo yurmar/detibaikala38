@@ -153,7 +153,8 @@ class KAC_Work_Page {
 						<?php if ( 'kac_rejected' !== $status ) : ?><button type="button" class="wpbtn danger" style="justify-content:center" data-act="reject"><?php esc_html_e( 'Отклонить…', 'kids-art-contest' ); ?></button><?php endif; ?>
 						<?php if ( 'kac_disqualified' !== $status ) : ?><button type="button" class="wpbtn danger" style="justify-content:center" data-act="disqualify"><?php echo 'publish' === $status ? esc_html__( 'Дисквалифицировать (после одобрения)', 'kids-art-contest' ) : esc_html__( 'Дисквалифицировать', 'kids-art-contest' ); ?></button><?php endif; ?>
 						<?php if ( 'kac_pending' !== $status ) : ?><button type="button" class="wpbtn" style="justify-content:center" data-act="pending"><?php esc_html_e( 'Вернуть в очередь', 'kids-art-contest' ); ?></button><?php endif; ?>
-						<span style="font-size:12px;color:#646970"><?php esc_html_e( 'Дисквалификация убирает работу из галереи и рейтинга, голоса сохраняются в журнале.', 'kids-art-contest' ); ?></span>
+						<button type="button" class="wpbtn danger" style="justify-content:center;margin-top:8px" data-act="delete">🗑 <?php esc_html_e( 'Удалить работу', 'kids-art-contest' ); ?></button>
+						<span style="font-size:12px;color:#646970"><?php esc_html_e( 'Дисквалификация убирает работу из галереи и рейтинга, голоса сохраняются в журнале. Удаление безвозвратно стирает работу, файлы, данные участника и голоса.', 'kids-art-contest' ); ?></span>
 						<?php $reason = (string) get_post_meta( $id, '_kac_reject_reason', true ); if ( $reason ) : ?><span style="font-size:12px;color:#b32d2e"><?php echo esc_html( 'Причина: ' . $reason ); ?></span><?php endif; ?>
 					</div></div>
 					<?php endif; ?>

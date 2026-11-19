@@ -8,6 +8,23 @@
 			.then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.message || I.error); return d; }); });
 	}
 
+	/* ---- Уведомления (toast) ---- */
+	var MSG = { approve: 'Работа одобрена', reject: 'Работа отклонена', disqualify: 'Работа дисквалифицирована', pending: 'Работа возвращена в очередь', 'delete': 'Работа удалена' };
+	function toast(text, err) {
+		var t = document.createElement('div'); t.className = 'kac-toast' + (err ? ' err' : ''); t.textContent = text; t.setAttribute('role', 'status');
+		document.body.appendChild(t);
+		setTimeout(function () { t.classList.add('on'); }, 10);
+		setTimeout(function () { t.classList.remove('on'); setTimeout(function () { t.remove(); }, 300); }, err ? 6000 : 3500);
+	}
+	try { var pt = sessionStorage.getItem('kacToast'); if (pt) { sessionStorage.removeItem('kacToast'); toast(pt); } } catch (e) {}
+	function busy(b, on) {
+		if (on) { b.dataset.l = b.innerHTML; b.disabled = true; b.style.opacity = '.6'; b.textContent = 'Подождите…'; }
+		else { b.disabled = false; b.style.opacity = ''; if (b.dataset.l) b.innerHTML = b.dataset.l; }
+	}
+	function confirmDelete(n, title) {
+		return window.confirm(n > 1 ? 'Удалить безвозвратно работы (' + n + ')? Будут стёрты файлы, данные участников и голоса.' : 'Удалить работу' + (title ? ' «' + title + '»' : '') + ' безвозвратно? Будут стёрты файл, данные участника и голоса. Это нельзя отменить.');
+	}
+
 	/* ---- Маска дат ДД.ММ.ГГГГ ЧЧ:ММ ---- */
 	$$('.kac-dt').forEach(function (i) {
 		i.addEventListener('input', function () {
@@ -117,15 +134,17 @@
 		}
 		function act(ids, action, opts) {
 			return Promise.all(ids.map(function (id) {
-				return api('/admin/works/' + id + '/moderate', 'POST', Object.assign({ action: action }, opts || {})).then(function () {
+				var req = action === 'delete' ? api('/admin/works/' + id, 'DELETE') : api('/admin/works/' + id + '/moderate', 'POST', Object.assign({ action: action }, opts || {}));
+				return req.then(function () {
 					var t = $('.mcard[data-id="' + id + '"]', grid);
 					if (t) { t.classList.add('gone'); setTimeout(function () { t.remove(); }, 300); }
 					updPend(-1);
 				});
-			})).catch(function (e) { window.alert(e.message); });
+			})).then(function () { toast(ids.length > 1 ? MSG[action] + ' (' + ids.length + ')' : MSG[action]); }).catch(function (e) { toast(e.message, true); });
 		}
 		function ask(ids, action) {
 			if (action === 'approve' || action === 'pending') return act(ids, action, { notify: true });
+			if (action === 'delete') { var dt = ids.length === 1 ? $('.mcard[data-id="' + ids[0] + '"]', grid) : null; if (confirmDelete(ids.length, dt ? dt.dataset.title : '')) return act(ids, action); return; }
 			var title = action === 'disqualify' ? 'Дисквалифицировать' : 'Отклонить';
 			if (ids.length === 1) { var t = $('.mcard[data-id="' + ids[0] + '"]', grid); title += ' работу «' + (t ? t.dataset.title : '') + '»'; } else title += ' (' + ids.length + ')';
 			askReason(action, title, function (o) { act(ids, action, o); });
@@ -178,7 +197,13 @@
 		$$('.kac-decision [data-act]').forEach(function (b) {
 			b.addEventListener('click', function () {
 				var a = b.dataset.act;
-				var go = function (o) { api('/admin/works/' + id + '/moderate', 'POST', Object.assign({ action: a }, o || {})).then(function () { location.reload(); }).catch(function (e) { window.alert(e.message); }); };
+				var done = function () { try { sessionStorage.setItem('kacToast', MSG[a]); } catch (e) {} if (a === 'delete') location.href = 'admin.php?page=kac-works'; else location.reload(); };
+				var go = function (o) {
+					$$('.kac-decision button').forEach(function (x) { x.disabled = true; }); busy(b, true);
+					var req = a === 'delete' ? api('/admin/works/' + id, 'DELETE') : api('/admin/works/' + id + '/moderate', 'POST', Object.assign({ action: a }, o || {}));
+					req.then(done).catch(function (e) { $$('.kac-decision button').forEach(function (x) { x.disabled = false; }); busy(b, false); toast(e.message, true); });
+				};
+				if (a === 'delete') { if (confirmDelete(1, $('#kac-f-title') ? $('#kac-f-title').value : '')) go(); return; }
 				if (a === 'reject' || a === 'disqualify') askReason(a, a === 'reject' ? 'Отклонить работу' : 'Дисквалифицировать работу', go); else go({ notify: true });
 			});
 		});
